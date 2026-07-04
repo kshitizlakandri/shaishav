@@ -1345,7 +1345,7 @@ document.addEventListener('click', function(e) {
 // ─────────────────────────────────────────────────────────
 async function getUserFromEmail(email) {
   const { data, error } = await supabaseClient.rpc('get_user_from_email', { p_email: email });
-  console.log(data);
+  // console.log(data);
   return data;
 }
 
@@ -1358,8 +1358,8 @@ async function checkUser() {
       username: userData.username,
       role: userData.role
     };
-    console.log(currentUser);
-    activateApp(currentUser);
+    console.log(userData);
+    activateApp(userData);
     // output.textContent = "Logged in user:\n" + JSON.stringify(user, null, 2);
   } else {
     // output.textContent = "Not logged in";
