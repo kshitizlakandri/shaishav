@@ -1208,12 +1208,7 @@
 
     const supabaseClient = window.supabase.createClient (
       SUPABASE_URL,
-      SUPABASE_ANON_KEY, {
-        auth: {
-            flowType: 'pkce', // Switches from '#' tokens to '?' code parameters
-            detectSessionInUrl: true
-        }
-    }
+      SUPABASE_ANON_KEY
     );
 // ─────────────────────────────────────────────────────────
 // STATE
