@@ -1352,8 +1352,8 @@ function getUserFromEmail(email) {
 async function checkUser() {
   const { data: { user } } = await supabaseClient.auth.getUser();
   if (user) {
-    console.log(user)
-    const userData = getUserFromEmail(user.email)
+    console.log(user);
+    const userData = getUserFromEmail(user.email);
     const currentUser = {
       username: userData.username,
       role: userData.role
