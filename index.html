@@ -1354,12 +1354,9 @@ async function checkUser() {
   if (user) {
     console.log(user);
     const userData = getUserFromEmail(user.email);
-    const currentUser = {
-      username: userData.username,
-      role: userData.role
-    };
     console.log(userData);
-    activateApp(userData);
+    console.log(getUserFromEmail(user.email));
+    // activateApp(userData);
     // output.textContent = "Logged in user:\n" + JSON.stringify(user, null, 2);
   } else {
     // output.textContent = "Not logged in";
