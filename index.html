@@ -1356,7 +1356,8 @@ async function checkUser() {
     const currentUser = {
       username: userData.username,
       role: userData.role
-    }
+    };
+    console.log(currentUser);
     activateApp(currentUser);
     // output.textContent = "Logged in user:\n" + JSON.stringify(user, null, 2);
   } else {
