@@ -1351,7 +1351,10 @@ async function checkUser() {
       } else {
         // output.textContent = "Not logged in";
           supabaseClient.auth.signInWithOAuth({
-          provider: "google"
+          provider: "google",
+          options: {
+            redirectTo: 'https://kshitizlakandri.github.io/shaishav/' // Must strictly match your dashboard allowlist
+          }
         });
       }
     }
