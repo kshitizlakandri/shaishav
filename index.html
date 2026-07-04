@@ -1201,7 +1201,20 @@
 
   <div id="toast"></div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
+    const SUPABASE_URL = "https://gpdihbkxacpfnpwdvfgw.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_BI2AZf0lFT4Mwd1nbFw9JA_Q85srW3C";
+
+    const supabaseClient = window.supabase.createClient (
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY, {
+        auth: {
+            flowType: 'pkce', // Switches from '#' tokens to '?' code parameters
+            detectSessionInUrl: true
+        }
+    }
+    );
 // ─────────────────────────────────────────────────────────
 // STATE
 // ─────────────────────────────────────────────────────────
@@ -1335,18 +1348,34 @@ document.addEventListener('click', function(e) {
 // ─────────────────────────────────────────────────────────
 // AUTH
 // ─────────────────────────────────────────────────────────
+async function checkUser() {
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      if (user) {
+        console.log(user)
+        // output.textContent = "Logged in user:\n" + JSON.stringify(user, null, 2);
+      } else {
+        // output.textContent = "Not logged in";
+          supabaseClient.auth.signInWithOAuth({
+          provider: "google"
+        });
+      }
+    }
+
 window.onload = function () {
-  google.script.run
-    .withSuccessHandler(function (user) {
-      if (!user) { showDenied('', 'No users have been added to the system yet.'); return; }
-      if (user.unauthorised) { showDenied(user.email, 'Your Google account is not authorised.'); return; }
-      currentUser = user;
-      activateApp();
-    })
-    .withFailureHandler(function (err) {
-      showDenied('', 'Could not verify your account. Try reloading. (' + err.message + ')');
-    })
-    .getCurrentUser();
+
+  checkUser();
+  
+  // google.script.run
+  //   .withSuccessHandler(function (user) {
+  //     if (!user) { showDenied('', 'No users have been added to the system yet.'); return; }
+  //     if (user.unauthorised) { showDenied(user.email, 'Your Google account is not authorised.'); return; }
+  //     currentUser = user;
+  //     activateApp();
+  //   })
+  //   .withFailureHandler(function (err) {
+  //     showDenied('', 'Could not verify your account. Try reloading. (' + err.message + ')');
+  //   })
+  //   .getCurrentUser();
 };
 
 function showDenied(email, msg) {
