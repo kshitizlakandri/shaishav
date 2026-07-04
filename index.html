@@ -1344,8 +1344,9 @@ document.addEventListener('click', function(e) {
 // AUTH
 // ─────────────────────────────────────────────────────────
 function getUserFromEmail(email) {
-  // console.log(data);
-  return supabaseClient.rpc('get_user_from_email', { p_email: email });
+  const { data, error } = supabaseClient.rpc('get_user_from_email', { p_email: email });
+  console.log(data);
+  return data;
 }
 
 async function checkUser() {
