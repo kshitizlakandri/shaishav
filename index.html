@@ -1,0 +1,1913 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shaishav - Inventory Manager</title>
+  <base target="_top">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap"
+    rel="stylesheet" />
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --ink: #0f1117;
+      --ink2: #3a3d4a;
+      --ink3: #8b8fa8;
+      --bg: #f5f4ef;
+      --surface: #ffffff;
+      --border: #e2e0d8;
+      --accent: #2a52be;
+      --accent2: #e8411e;
+      --gold: #c9a84c;
+      --green: #1b7a4e;
+      --radius: 10px;
+      --shadow: 0 2px 16px rgba(15, 17, 23, .08);
+      --sidebar-width: 200px;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+
+    /* ─── APP SHELL ─── */
+    #app-shell {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ─── SIDEBAR ─── */
+    #sidebar {
+      width: var(--sidebar-width);
+      background: var(--ink);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      z-index: 200;
+      box-shadow: 2px 0 12px rgba(0, 0, 0, .28);
+      overflow-y: auto;
+    }
+
+    #sidebar.hidden {
+      display: none;
+    }
+
+    .sidebar-logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: .06em;
+      display: flex;
+      align-items: center;
+      gap: .45rem;
+      cursor: pointer;
+      padding: 1.1rem 1rem 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, .08);
+      color: #fff;
+    }
+
+    .sidebar-logo img {
+      height: 26px;
+      flex-shrink: 0;
+    }
+
+    .sidebar-user {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .85rem 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, .08);
+    }
+
+    .user-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--gold);
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Syne', sans-serif;
+      font-size: .72rem;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .sidebar-user-info {
+      display: flex;
+      flex-direction: column;
+      gap: .15rem;
+      min-width: 0;
+    }
+
+    .user-name {
+      font-size: .78rem;
+      font-weight: 500;
+      color: rgba(255, 255, 255, .9);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .admin-pill {
+      font-family: 'Syne', sans-serif;
+      font-size: .58rem;
+      font-weight: 700;
+      letter-spacing: .06em;
+      background: var(--gold);
+      color: var(--ink);
+      border-radius: 4px;
+      padding: .08rem .35rem;
+      width: fit-content;
+    }
+
+    nav {
+      display: flex;
+      flex-direction: column;
+      gap: .2rem;
+      padding: .75rem .6rem;
+      flex: 1;
+    }
+
+    nav button {
+      font-family: 'Syne', sans-serif;
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, .55);
+      background: transparent;
+      border: none;
+      padding: .55rem .75rem;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: all .18s;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      text-align: left;
+      width: 100%;
+    }
+
+    nav button:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, .1);
+    }
+
+    nav button.active {
+      color: #fff;
+      background: var(--accent);
+    }
+
+    .sidebar-ext-link {
+      padding: .6rem;
+      border-top: 1px solid rgba(255, 255, 255, .08);
+    }
+
+    .sidebar-ext-link a {
+      font-family: 'Syne', sans-serif;
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, .45);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: .45rem;
+      padding: .5rem .75rem;
+      border-radius: 7px;
+      transition: all .18s;
+    }
+
+    .sidebar-ext-link a:hover {
+      color: var(--gold);
+      background: rgba(255, 255, 255, .07);
+    }
+
+    .sidebar-ext-link a svg {
+      flex-shrink: 0;
+      opacity: .6;
+    }
+
+    .sidebar-ext-link a:hover svg {
+      opacity: 1;
+    }
+
+    #content-area {
+      margin-left: var(--sidebar-width);
+      flex: 1;
+      min-width: 0;
+    }
+
+    .screen {
+      display: none;
+      min-height: 100vh;
+    }
+
+    #screen-loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--ink);
+      position: relative;
+      overflow: hidden;
+      min-height: 100vh;
+      width: 100%;
+    }
+
+    #screen-loading::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 60% 40%, rgba(42, 82, 190, .18) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 50% at 20% 80%, rgba(201, 168, 76, .1) 0%, transparent 60%);
+    }
+
+    #screen-loading.active {
+      display: flex;
+    }
+
+    #screen-app.active {
+      display: block;
+    }
+
+    .loading-card {
+      position: relative;
+      text-align: center;
+      padding: 3rem 2.5rem;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .loading-logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: .06em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: .5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .loading-logo img {
+      height: 36px;
+    }
+
+    .loading-spinner-wrap {
+      margin-bottom: 1.25rem;
+      display: flex;
+      justify-content: center;
+    }
+
+    .loading-spinner-wrap .spinner {
+      width: 32px;
+      height: 32px;
+      border-width: 3px;
+    }
+
+    .loading-msg {
+      font-size: .9rem;
+      color: rgba(255, 255, 255, .4);
+    }
+
+    .denied-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .denied-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: .5rem;
+    }
+
+    .denied-sub {
+      font-size: .84rem;
+      color: rgba(255, 255, 255, .4);
+      line-height: 1.6;
+    }
+
+    .denied-email {
+      display: inline-block;
+      margin-top: .75rem;
+      font-family: 'Syne', sans-serif;
+      font-size: .78rem;
+      font-weight: 600;
+      letter-spacing: .04em;
+      color: #ff8a75;
+      background: rgba(232, 65, 30, .15);
+      border: 1px solid rgba(232, 65, 30, .3);
+      border-radius: 6px;
+      padding: .3rem .75rem;
+    }
+
+    main {
+      flex: 1;
+      padding: 1.75rem 2rem;
+      max-width: 1260px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+      animation: fadeUp .25s ease;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .page-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 1.6rem;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .page-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .page-subtitle {
+      font-size: .82rem;
+      color: var(--ink3);
+      margin-top: .3rem;
+    }
+
+    #screen-home {
+      padding: 2.5rem 2rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .home-greeting { margin-bottom: 2.5rem; }
+    .home-greeting-sub { font-size: .85rem; color: var(--ink3); margin-bottom: .4rem; }
+    .home-greeting-title { font-family: 'Syne', sans-serif; font-size: 2.2rem; font-weight: 800; line-height: 1.1; }
+    .home-greeting-title span { color: var(--accent); }
+
+    .home-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: .9rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .home-stat {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.2rem 1.3rem;
+    }
+
+    .home-stat-label { font-size: .7rem; font-weight: 500; letter-spacing: .05em; text-transform: uppercase; color: var(--ink3); margin-bottom: .3rem; }
+    .home-stat-value { font-family: 'Syne', sans-serif; font-size: 1.7rem; font-weight: 800; }
+
+    .home-menu-title { font-family: 'Syne', sans-serif; font-size: .8rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink3); margin-bottom: 1rem; }
+
+    .home-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .home-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.6rem 1.4rem;
+      cursor: pointer;
+      transition: all .2s;
+      display: flex;
+      flex-direction: column;
+      gap: .75rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .home-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--card-accent, var(--accent));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .25s;
+    }
+
+    .home-card:hover { border-color: var(--card-accent, var(--accent)); transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,.1); }
+    .home-card:hover::after { transform: scaleX(1); }
+    .home-card-icon { font-size: 1.8rem; }
+    .home-card-title { font-family: 'Syne', sans-serif; font-size: .95rem; font-weight: 700; }
+    .home-card-desc { font-size: .78rem; color: var(--ink3); line-height: 1.5; }
+    .home-card-count { font-family: 'Syne', sans-serif; font-size: .72rem; font-weight: 700; letter-spacing: .04em; color: var(--card-accent, var(--accent)); background: rgba(42,82,190,.08); padding: .2rem .6rem; border-radius: 5px; width: fit-content; }
+
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.3rem;
+      border-bottom: 1px solid var(--border);
+      background: #fafaf8;
+    }
+
+    .card-title { font-family: 'Syne', sans-serif; font-size: .82rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--ink2); }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 1rem;
+      padding: 1.3rem;
+    }
+
+    .form-group { display: flex; flex-direction: column; gap: .35rem; }
+    .form-group.full { grid-column: 1 / -1; }
+
+    label { font-size: .7rem; font-weight: 500; letter-spacing: .05em; text-transform: uppercase; color: var(--ink3); }
+
+    input, select, textarea {
+      font-family: 'DM Sans', sans-serif;
+      font-size: .88rem;
+      color: var(--ink);
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 7px;
+      padding: .58rem .8rem;
+      outline: none;
+      width: 100%;
+      transition: border-color .18s, box-shadow .18s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(42,82,190,.1);
+      background: #fff;
+    }
+
+    textarea { resize: vertical; min-height: 65px; }
+
+    .readonly-field { background: #f0efe9 !important; color: var(--ink3); cursor: not-allowed; }
+
+    .form-actions {
+      padding: .9rem 1.3rem 1.3rem;
+      display: flex;
+      align-items: center;
+      gap: .9rem;
+      border-top: 1px solid var(--border);
+      background: #fafaf8;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      font-family: 'Syne', sans-serif;
+      font-size: .75rem;
+      font-weight: 700;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      padding: .6rem 1.3rem;
+      border-radius: 7px;
+      border: none;
+      cursor: pointer;
+      transition: all .18s;
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+    }
+
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: #1e3d9e; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(42,82,190,.3); }
+    .btn-primary:disabled { background: var(--ink3); cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-success { background: var(--green); color: #fff; }
+    .btn-success:hover { background: #145f3c; transform: translateY(-1px); }
+    .btn-danger { background: #fee2e2; color: #b91c1c; }
+    .btn-danger:hover { background: #fecaca; }
+    .btn-warn { background: #fef3c7; color: #92400e; }
+    .btn-warn:hover { background: #fde68a; }
+    .btn-sm { padding: .38rem .85rem; font-size: .68rem; }
+
+    .table-wrap { overflow-x: auto; }
+
+    table { width: 100%; border-collapse: collapse; font-size: .84rem; }
+    thead tr { background: #fafaf8; }
+    th { font-family: 'Syne', sans-serif; font-size: .68rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink3); padding: .8rem 1rem; text-align: left; border-bottom: 2px solid var(--border); white-space: nowrap; }
+    td { padding: .75rem 1rem; border-bottom: 1px solid var(--border); color: var(--ink2); white-space: nowrap; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #f8f7f2; }
+
+    .badge { display: inline-block; font-size: .66rem; font-weight: 600; letter-spacing: .04em; padding: .18rem .5rem; border-radius: 4px; font-family: 'Syne', sans-serif; }
+    .badge-blue { background: #dbeafe; color: #1d4ed8; }
+    .badge-green { background: #dcfce7; color: #15803d; }
+    .badge-amber { background: #fef3c7; color: #92400e; }
+    .badge-red { background: #fee2e2; color: #b91c1c; }
+    .badge-purple { background: #ede9fe; color: #6d28d9; }
+    .badge-gray { background: #f1f5f9; color: #64748b; }
+    .status-pending { background: #fef3c7; color: #92400e; }
+    .status-approved { background: #dcfce7; color: #15803d; }
+    .status-rejected { background: #fee2e2; color: #b91c1c; }
+    .status-fulfilled { background: #dbeafe; color: #1d4ed8; }
+
+    .stats-strip { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: .8rem; margin-bottom: 1.5rem; }
+    .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.2rem; min-width: 190px; display: inline-block;}
+    .stat-label { font-size: .68rem; font-weight: 500; letter-spacing: .05em; text-transform: uppercase; color: var(--ink3); }
+    .stat-value { font-family: 'Syne', sans-serif; font-size: 1.00rem; font-weight: 800; color: var(--ink); }
+    .stat-sub { font-size: .75rem; color: var(--ink3); }
+
+    .split-2 { display: grid; grid-template-columns: 1fr 1.55fr; gap: 1.4rem; align-items: start; }
+    .split-equal { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem; align-items: start; }
+
+    .id-preview { font-family: 'Syne', sans-serif; font-size: .75rem; font-weight: 700; letter-spacing: .08em; color: var(--accent); background: #dbeafe; padding: .22rem .6rem; border-radius: 5px; }
+
+    .search-wrap { padding: .85rem 1rem .35rem; }
+    .search-inner { position: relative; }
+    .search-inner input { padding-left: 2.3rem; background: var(--surface); }
+    .search-icon-abs { position: absolute; left: .7rem; top: 50%; transform: translateY(-50%); color: var(--ink3); font-size: .85rem; pointer-events: none; }
+
+    /* ─── AVAILABILITY PANEL ─── */
+    .availability-panel { margin: 0 1.3rem 1rem; border-radius: 8px; border: 1.5px solid var(--border); overflow: hidden; display: none; }
+    .availability-panel.show { display: block; }
+    .avail-header { padding: .6rem 1rem; background: #f8f7f2; border-bottom: 1px solid var(--border); font-family: 'Syne', sans-serif; font-size: .7rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink3); }
+    .avail-body { display: flex; gap: 0; }
+    .avail-stat { flex: 1; padding: .8rem 1rem; text-align: center; border-right: 1px solid var(--border); }
+    .avail-stat:last-child { border-right: none; }
+    .avail-stat-label { font-size: .65rem; text-transform: uppercase; letter-spacing: .05em; color: var(--ink3); margin-bottom: .2rem; }
+    .avail-stat-value { font-family: 'Syne', sans-serif; font-size: 1.3rem; font-weight: 800; }
+    .avail-ok { color: var(--green); }
+    .avail-warn { color: #d97706; }
+    .avail-zero { color: var(--accent2); }
+
+    /* ─── FILTER TABS ─── */
+    .filter-tabs { display: flex; gap: .4rem; padding: .85rem 1rem .35rem; flex-wrap: wrap; }
+    .filter-tab { font-family: 'Syne', sans-serif; font-size: .68rem; font-weight: 700; letter-spacing: .05em; padding: .3rem .8rem; border-radius: 20px; border: 1.5px solid var(--border); background: transparent; cursor: pointer; transition: all .15s; color: var(--ink3); }
+    .filter-tab:hover { border-color: var(--accent); color: var(--accent); }
+    .filter-tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    .empty { text-align: center; padding: 2.5rem 1rem; color: var(--ink3); }
+    .empty-icon { font-size: 2rem; margin-bottom: .6rem; }
+    .empty-text { font-family: 'Syne', sans-serif; font-size: .85rem; font-weight: 600; }
+
+    .load-center { display: flex; align-items: center; justify-content: center; padding: 3rem; gap: .75rem; color: var(--ink3); font-size: .88rem; }
+    .load-center .spinner { border-color: rgba(139,143,168,.25); border-top-color: var(--accent); }
+
+    #toast { position: fixed; bottom: 2rem; right: 2rem; padding: .8rem 1.3rem; border-radius: var(--radius); font-family: 'Syne', sans-serif; font-size: .8rem; font-weight: 600; letter-spacing: .03em; color: #fff; z-index: 9999; pointer-events: none; transition: opacity .3s, transform .3s; transform: translateY(12px); opacity: 0; display: flex; align-items: center; gap: .5rem; box-shadow: 0 4px 20px rgba(0,0,0,.2); }
+    #toast.show { opacity: 1; transform: translateY(0); }
+    #toast.success { background: var(--green); }
+    #toast.error { background: var(--accent2); }
+
+    .spinner { width: 16px; height: 16px; border: 2.5px solid rgba(255,255,255,.35); border-top-color: #fff; border-radius: 50%; animation: spin .6s linear infinite; display: inline-block; flex-shrink: 0; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: flex; align-items: center; justify-content: center; z-index: 500; opacity: 0; pointer-events: none; transition: opacity .2s; }
+    .modal-overlay.show { opacity: 1; pointer-events: all; }
+    .modal { background: var(--surface); border-radius: 12px; padding: 2rem; width: 100%; max-width: 420px; box-shadow: 0 20px 50px rgba(0,0,0,.2); transform: scale(.95); transition: transform .2s; }
+    .modal-overlay.show .modal { transform: scale(1); }
+    .modal-title { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; margin-bottom: .5rem; }
+    .modal-desc { font-size: .85rem; color: var(--ink2); margin-bottom: 1.2rem; line-height: 1.55; }
+    .modal-actions { display: flex; gap: .75rem; justify-content: flex-end; flex-wrap: wrap; }
+    .modal-field { margin-bottom: 1rem; display: flex; flex-direction: column; gap: .35rem; }
+
+    /* ─── SEARCHABLE COMBOBOX ─── */
+    .combobox-wrap {
+      position: relative;
+      width: 100%;
+    }
+
+    .combobox-input-wrap {
+      position: relative;
+    }
+
+    .combobox-input {
+      width: 100%;
+      padding-right: 2rem !important;
+      cursor: text;
+    }
+
+    .combobox-input.has-value {
+      border-color: var(--accent);
+      background: #fff;
+    }
+
+    .combobox-chevron {
+      position: absolute;
+      right: .7rem;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      color: var(--ink3);
+      font-size: .7rem;
+      transition: transform .18s;
+    }
+
+    .combobox-wrap.open .combobox-chevron {
+      transform: translateY(-50%) rotate(180deg);
+    }
+
+    .combobox-dropdown {
+      display: none;
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      right: 0;
+      background: var(--surface);
+      border: 1.5px solid var(--accent);
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(15,17,23,.14);
+      z-index: 300;
+      max-height: 220px;
+      overflow-y: auto;
+    }
+
+    .combobox-wrap.open .combobox-dropdown {
+      display: block;
+    }
+
+    .combobox-option {
+      padding: .55rem .8rem;
+      font-size: .87rem;
+      color: var(--ink2);
+      cursor: pointer;
+      border-bottom: 1px solid var(--border);
+      transition: background .12s;
+      line-height: 1.4;
+    }
+
+    .combobox-option:last-child {
+      border-bottom: none;
+    }
+
+    .combobox-option:hover,
+    .combobox-option.highlighted {
+      background: #eef2ff;
+      color: var(--accent);
+    }
+
+    .combobox-option mark {
+      background: transparent;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .combobox-empty {
+      padding: .75rem .8rem;
+      font-size: .82rem;
+      color: var(--ink3);
+      text-align: center;
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 860px) {
+      .split-2, .split-equal { grid-template-columns: 1fr; }
+      :root { --sidebar-width: 56px; }
+      .sidebar-logo span, .sidebar-user-info, nav button span, .sidebar-ext-link a span { display: none; }
+      .sidebar-logo { justify-content: center; padding: 1rem .5rem; }
+      .sidebar-user { justify-content: center; padding: .75rem .5rem; }
+      nav { padding: .5rem .35rem; align-items: center; }
+      nav button { justify-content: center; padding: .55rem; width: auto; }
+      .sidebar-ext-link { padding: .5rem .35rem; display: flex; justify-content: center; }
+      .sidebar-ext-link a { padding: .5rem; justify-content: center; }
+    }
+
+    @media (max-width: 540px) {
+      main { padding: 1rem; }
+      .form-grid { grid-template-columns: 1fr; }
+      .avail-body { flex-direction: column; }
+      .avail-stat { border-right: none; border-bottom: 1px solid var(--border); }
+      .avail-stat:last-child { border-bottom: none; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ═══════════════════ LOADING SCREEN ═══════════════════ -->
+  <div>
+    <div class="screen active" id="screen-loading">
+      <div class="loading-card" id="loading-card-inner">
+        <div class="loading-logo">
+          <img src="https://shaishavchildrights.org/wp-content/uploads/2025/07/Shaishav-Trust-Bhavnagar-Logo-Final.jpg" alt="Shaishav Logo"> Shaishav
+        </div>
+        <div class="loading-spinner-wrap"><div class="spinner"></div></div>
+        <div class="loading-msg">Verifying your access…</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ APP SCREEN ═══════════════════ -->
+  <div class="screen" id="screen-app">
+    <div id="app-shell">
+
+      <!-- ── SIDEBAR ── -->
+      <aside id="sidebar" class="hidden">
+        <div class="sidebar-logo" onclick="goHome()">
+          <img src="https://shaishavchildrights.org/wp-content/uploads/2025/07/Shaishav-Trust-Bhavnagar-Logo-Final.jpg" alt="Shaishav Logo">
+          <span>Shaishav</span>
+        </div>
+
+        <div class="sidebar-user" id="user-chip">
+          <div class="user-avatar" id="user-avatar">?</div>
+          <div class="sidebar-user-info">
+            <span class="user-name" id="user-name-display">User</span>
+            <span class="admin-pill" id="admin-pill" style="display:none">ADMIN</span>
+          </div>
+        </div>
+
+        <nav id="main-nav">
+          <button onclick="showPage('home')"      id="nav-home">🏠 <span>Home</span></button>
+          <button onclick="showPage('catalogue')" id="nav-catalogue">🗂 <span>Category Master</span></button>
+          <button onclick="showPage('items')"     id="nav-items">📦 <span>Item Master</span></button>
+          <button onclick="showPage('pr')"        id="nav-pr">📋 <span>PR</span></button>
+          <button onclick="showPage('pl')"        id="nav-pl">🧾 <span>Purchase Order</span></button>
+          <button onclick="showPage('indent')"    id="nav-indent">📤 <span>Indent</span></button>
+          <button onclick="goToReportsPage()"    id="nav-reports">📊 <span>Reports</span></button>
+        </nav>
+
+        <div class="sidebar-ext-link" id="ext-link-wrap" style="display:none;">
+          <a id="ext-link-anchor" href="#" target="_blank">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            <span id="ext-link-label">External</span>
+          </a>
+        </div>
+      </aside>
+
+      <!-- ── CONTENT AREA ── -->
+      <div id="content-area">
+        <main>
+
+          <!-- ── HOME PAGE ── -->
+          <div class="page active" id="page-home">
+            <div id="home-greeting" class="home-greeting">
+              <div class="home-greeting-sub">Welcome back 👋</div>
+              <div class="home-greeting-title">Hello, <span id="greet-name">there</span></div>
+            </div>
+            <div class="home-stats">
+              <div class="home-stat"><div class="home-stat-label">Items</div><div class="home-stat-value" id="hs-items">—</div></div>
+              <div class="home-stat"><div class="home-stat-label">PRs Raised</div><div class="home-stat-value" id="hs-prs">—</div></div>
+              <div class="home-stat"><div class="home-stat-label">Ledger Entries</div><div class="home-stat-value" id="hs-pls">—</div></div>
+              <div class="home-stat"><div class="home-stat-label">Indents</div><div class="home-stat-value" id="hs-indents">—</div></div>
+              <div class="home-stat"><div class="home-stat-label">Categories</div><div class="home-stat-value" id="hs-cats">—</div></div>
+              <div class="home-stat"><div class="home-stat-label">Pending PRs</div><div class="home-stat-value" id="hs-pending" style="color:var(--gold)">—</div></div>
+            </div>
+            <div class="home-menu-title">Modules</div>
+            <div class="home-grid">
+              <div class="home-card" style="--card-accent:#6d28d9" onclick="showPage('catalogue')">
+                <div class="home-card-icon">🗂</div>
+                <div class="home-card-title">Category Master</div>
+                <div class="home-card-desc">Manage categories and subcategories with auto-generated codes.</div>
+                <div class="home-card-count" style="background:rgba(109,40,217,.08); color:#6d28d9;" id="hc-catalogue">— entries</div>
+              </div>
+              <div class="home-card" style="--card-accent:var(--accent)" onclick="showPage('items')">
+                <div class="home-card-icon">📦</div>
+                <div class="home-card-title">Items Master</div>
+                <div class="home-card-desc">Add and manage all inventory items with auto item codes.</div>
+                <div class="home-card-count" id="hc-items">— items</div>
+              </div>
+              <div class="home-card" style="--card-accent:#92400e" onclick="showPage('pr')">
+                <div class="home-card-icon">📋</div>
+                <div class="home-card-title">Purchase Requisition</div>
+                <div class="home-card-desc">Raise purchase requests. Admins approve, reject, or mark fulfilled.</div>
+                <div class="home-card-count" style="background:rgba(146,64,14,.08); color:#92400e;" id="hc-prs">— PRs</div>
+              </div>
+              <div class="home-card" style="--card-accent:var(--green)" onclick="showPage('pl')">
+                <div class="home-card-icon">🧾</div>
+                <div class="home-card-title">Purchase Order</div>
+                <div class="home-card-desc">Record received materials. Optionally link to an approved PR.</div>
+                <div class="home-card-count" style="background:rgba(27,122,78,.08); color:var(--green);" id="hc-pls">— entries</div>
+              </div>
+              <div class="home-card" style="--card-accent:var(--accent2)" onclick="showPage('indent')">
+                <div class="home-card-icon">📤</div>
+                <div class="home-card-title">Indent</div>
+                <div class="home-card-desc">Issue items from stock and track requested vs issued vs consumed.</div>
+                <div class="home-card-count" style="background:rgba(232,65,30,.08); color:var(--accent2);" id="hc-indents">— indents</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── CATALOGUE PAGE ── -->
+          <div class="page" id="page-catalogue">
+            <div class="page-header">
+              <div>
+                <div class="page-title">Category Master</div>
+                <div class="page-subtitle">Manage categories, subcategories and their codes</div>
+              </div>
+            </div>
+            <div class="split-equal">
+              <div class="card">
+                <div class="card-header">
+                  <span class="card-title">Add New Entry</span>
+                  <span class="id-preview" id="cat-code-preview">Auto Code</span>
+                </div>
+                <div class="form-grid">
+                  <div class="form-group"><label>Category *</label><input type="text" id="cat-category" placeholder="e.g. Stationery" oninput="updateCatCodePreview()" /></div>
+                  <div class="form-group"><label>Subcategory *</label><input type="text" id="cat-subcategory" placeholder="e.g. Educational" oninput="updateCatCodePreview()" /></div>
+                </div>
+                <div class="form-actions">
+                  <button class="btn btn-primary" onclick="submitCatalogue()" id="btn-add-cat">＋ Add Entry</button>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-header">
+                  <span class="card-title">All Catalogue Entries</span>
+                  <span id="cat-count" class="badge badge-purple">0</span>
+                </div>
+                <div class="search-wrap">
+                  <div class="search-inner">
+                    <span class="search-icon-abs">🔍</span>
+                    <input type="text" placeholder="Search catalogue…" oninput="filterTable('cat-table', this.value)" />
+                  </div>
+                </div>
+                <div class="table-wrap" style="max-height:420px; overflow-y:auto;">
+                  <table id="cat-table">
+                    <thead><tr><th>Category</th><th>Subcategory</th><th>Code</th><th></th></tr></thead>
+                    <tbody id="cat-tbody"><tr><td colspan="4"><div class="load-center"><div class="spinner"></div>Loading…</div></td></tr></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── ITEMS PAGE ── -->
+          <div class="page" id="page-items">
+            <div class="page-header">
+              <div>
+                <div class="page-title">Items Master</div>
+                <div class="page-subtitle">Add and manage inventory items</div>
+              </div>
+            </div>
+            <div class="stats-strip" id="items-stats"></div>
+            <div class="split-equal">
+              <div class="card">
+                <div class="card-header">
+                  <span class="card-title">Add New Item</span>
+                  <span class="id-preview" id="item-code-preview">Auto ID</span>
+                </div>
+                <div class="form-grid">
+                  <div class="form-group"><label>Item Name *</label><input type="text" id="item-name" placeholder="e.g. Pencil" /></div>
+                  <div class="form-group">
+                    <label>Category *</label><select id="item-category" onchange="onCategoryChange()"><option value="">Select category…</option></select>
+                  </div>
+                  <div class="form-group">
+                    <label>Subcategory *</label><select id="item-subcategory" onchange="updateItemCodePreview()"><option value="">Select subcategory…</option></select>
+                  </div>
+                  <div class="form-group"><label>Item Type</label><input type="text" id="item-type" placeholder="e.g. Consumable" /></div>
+                  <div class="form-group full"><label>Description</label><textarea id="item-desc" placeholder="Brief description…"></textarea></div>
+                  <div class="form-group full"><label>Remarks</label><input type="text" id="item-remarks" placeholder="Any remarks…" /></div>
+                </div>
+                <div class="form-actions">
+                  <button class="btn btn-primary" onclick="submitItem()" id="btn-add-item">＋ Add Item</button>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-header">
+                  <span class="card-title">All Items</span>
+                  <span id="items-count" class="badge badge-blue">0</span>
+                </div>
+                <div class="search-wrap">
+                  <div class="search-inner">
+                    <span class="search-icon-abs">🔍</span>
+                    <input type="text" placeholder="Search items…" oninput="filterTable('items-table', this.value)" />
+                  </div>
+                </div>
+                <div class="table-wrap" style="max-height:480px; overflow-y:auto;">
+                  <table id="items-table">
+                    <thead><tr><th>Code</th><th>Name</th><th>Category</th><th>Subcategory</th><th>Description</th></tr></thead>
+                    <tbody id="items-tbody"><tr><td colspan="5"><div class="load-center"><div class="spinner"></div>Loading…</div></td></tr></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── PR PAGE ── -->
+          <div class="page" id="page-pr">
+            <div class="page-header">
+              <div>
+                <div class="page-title">Purchase Requisition</div>
+                <div class="page-subtitle">Raise and track purchase requests</div>
+              </div>
+            </div>
+            <div class="stats-strip" id="pr-stats"></div>
+            <div class="split-2">
+              <div class="card">
+                <div class="card-header">
+                  <span class="card-title">New PR</span>
+                  <span class="id-preview" id="pr-number-preview">Auto ID</span>
+                </div>
+                <div class="form-grid">
+                  <div class="form-group"><label>PR Date *</label><input type="date" id="pr-date" /></div>
+                  <div class="form-group">
+                    <label>Location *</label><select id="pr-location" onchange="onPRLocationChange()"><option value="">Select…</option></select>
+                  </div>
+
+                  <!-- ── SEARCHABLE ITEM COMBOBOX (PR page only) ── -->
+                  <div class="form-group full">
+                    <label>Item *</label>
+                    <div class="combobox-wrap" id="pr-item-combobox">
+                      <div class="combobox-input-wrap">
+                        <input
+                          type="text"
+                          class="combobox-input"
+                          id="pr-item-search"
+                          placeholder="Type to search items…"
+                          autocomplete="off"
+                          oninput="onPRItemSearch()"
+                          onfocus="openPRItemDropdown()"
+                        />
+                        <span class="combobox-chevron">▼</span>
+                      </div>
+                      <div class="combobox-dropdown" id="pr-item-dropdown"></div>
+                      <!-- hidden field carries the actual value, same id as before so all callers work -->
+                      <input type="hidden" id="pr-item" />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="availability-panel" id="pr-availability">
+                  <div class="avail-header">📊 Stock at selected location</div>
+                  <div class="avail-body">
+                    <div class="avail-stat"><div class="avail-stat-label">Received</div><div class="avail-stat-value" id="avail-received">—</div></div>
+                    <div class="avail-stat"><div class="avail-stat-label">Issued</div><div class="avail-stat-value" id="avail-issued">—</div></div>
+                    <div class="avail-stat"><div class="avail-stat-label">Available</div><div class="avail-stat-value" id="avail-available">—</div></div>
+                  </div>
+                </div>
+
+                <div class="form-grid">
+                  <div class="form-group full"><label>Item Description</label><input type="text" id="pr-item-desc" class="readonly-field" readonly /></div>
+                  <div class="form-group"><label>Quantity *</label><input type="number" id="pr-qty" placeholder="0" oninput="calcBudget()" /></div>
+                  <div class="form-group"><label>Price / Unit</label><input type="number" id="pr-price" placeholder="0.00" oninput="calcBudget()" /></div>
+                  <div class="form-group"><label>Budget (Auto)</label><input type="text" id="pr-budget" class="readonly-field" readonly /></div>
+                  <div class="form-group"><label>Date Required *</label><input type="date" id="pr-date-req" /></div>
+                  <div class="form-group full"><label>Purpose</label><input type="text" id="pr-purpose" placeholder="e.g. Balsena Project" /></div>
+                  <div class="form-group full"><label>Remarks</label><input type="text" id="pr-remarks" /></div>
+                </div>
+                <div class="form-actions">
+                  <button class="btn btn-primary" onclick="submitPR()" id="btn-add-pr">＋ Submit PR</button>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header">
+                  <span class="card-title">All Purchase Requisitions</span>
+                  <span id="pr-count" class="badge badge-amber">0</span>
+                </div>
+                <div class="filter-tabs" id="pr-filter-tabs">
+                  <button class="filter-tab active" onclick="setPRFilter('All', this)">All</button>
+                  <button class="filter-tab" onclick="setPRFilter('Pending', this)">Pending</button>
+                  <button class="filter-tab" onclick="setPRFilter('Approved', this)">Approved</button>
+                  <button class="filter-tab" onclick="setPRFilter('Rejected', this)">Rejected</button>
+                  <button class="filter-tab" onclick="setPRFilter('Fulfilled', this)">Fulfilled</button>
+                </div>
+                <div class="search-wrap" style="padding-top:.35rem;">
+                  <div class="search-inner">
+                    <span class="search-icon-abs">🔍</span>
+                    <input type="text" placeholder="Search PRs…" oninput="filterPRTable(this.value)" />
+                  </div>
+                </div>
+                <div class="table-wrap" style="max-height:560px; overflow-y:auto;">
+                  <table id="pr-table">
+                    <thead>
+                      <tr>
+                        <th>PR No.</th><th>Date</th><th>Location</th><th>Item</th>
+                        <th>Qty</th><th>Budget</th><th>Status</th>
+                        <th>Requested By</th><th>Approved By</th><th>Linked PL</th><th></th>
+                      </tr>
+                    </thead>
+                    <tbody id="pr-tbody"><tr><td colspan="10"><div class="load-center"><div class="spinner"></div>Loading…</div></td></tr></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── PL PAGE ── -->
+          <div class="page" id="page-pl">
+            <div class="page-header">
+              <div>
+                <div class="page-title">Purchase Order</div>
+                <div class="page-subtitle">Record received materials and purchases</div>
+              </div>
+            </div>
+            <div class="stats-strip" id="pl-stats"></div>
+            <div class="split-2">
+              <div class="card">
+                <div class="card-header">
+                  <span class="card-title">New Entry</span>
+                  <span class="id-preview" id="pl-number-preview">Auto ID</span>
+                </div>
+                <div class="form-grid">
+                  <div class="form-group"><label>Date Received</label><input type="date" id="pl-date" /></div>
+                  <div class="form-group"><label>Location *</label><select id="pl-location"><option value="">Select…</option></select></div>
+                  <div class="form-group full"><label>Item *</label><select id="pl-item" onchange="onPLItemChange()"><option value="">Select item…</option></select></div>
+                  <div class="form-group full"><label>Item Description</label><input type="text" id="pl-item-desc" class="readonly-field" readonly /></div>
+                  <div class="form-group full">
+                    <label>PR Reference <span style="color:var(--ink3); font-size:.65rem; text-transform:none; letter-spacing:0">(optional)</span></label>
+                    <select id="pl-linked-pr"><option value="">— None —</option></select>
+                  </div>
+                  <div class="form-group">
+                    <label for="source">Source</label>
+                    <select name="source" required>
+                      <option value="" disabled selected hidden>Donation / Purchase</option>
+                      <option value="Donation">Donation</option>
+                      <option value="Purchase">Purchase</option>
+                    </select>
+                    <!-- <label>Source</label>
+                    <input type="text" id="pl-source" placeholder="Donation / Purchase" /> -->
+                  </div>
+                  <div class="form-group">
+                    <label for="condition">Condition</label>
+                    <select name="condition" required>
+                      <option value="" disabled selected hidden>New / Used</option>
+                      <option value="New">New</option>
+                      <option value="Used">Used</option>
+                    </select>
+                  </div>
+                  <div class="form-group full"><label>Purchased / Received From</label><input type="text" id="pl-from" placeholder="Vendor or donor name" /></div>
+                  <div class="form-group"><label>Quantity *</label><input type="number" id="pl-qty" placeholder="0" oninput="calcTotal()" /></div>
+                  <div class="form-group"><label>Price / Unit</label><input type="number" id="pl-price" placeholder="0.00" oninput="calcTotal()" /></div>
+                  <div class="form-group"><label>Total (Auto)</label><input type="text" id="pl-total" class="readonly-field" readonly /></div>
+                  <div class="form-group"><label>Billing Date</label><input type="date" id="pl-billing-date" /></div>
+                  <div class="form-group full"><label>Bill / Receipt / Indent No.</label><input type="text" id="pl-bill-no" placeholder="e.g. BILL-001" /></div>
+                  <div class="form-group full"><label>Remarks</label><input type="text" id="pl-remarks" /></div>
+                </div>
+                <div class="form-actions">
+                  <button class="btn btn-primary" onclick="submitPL()" id="btn-add-pl">＋ Add Entry</button>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-header">
+                  <span class="card-title">All Ledger Entries</span>
+                  <span id="pl-count" class="badge badge-green">0</span>
+                </div>
+                <div class="search-wrap">
+                  <div class="search-inner">
+                    <span class="search-icon-abs">🔍</span>
+                    <input type="text" placeholder="Search…" oninput="filterTable('pl-table', this.value)" />
+                  </div>
+                </div>
+                <div class="table-wrap" style="max-height:600px; overflow-y:auto;">
+                  <table id="pl-table">
+                    <thead><tr><th>PL No.</th><th>Date</th><th>Location</th><th>Item</th><th>Source</th><th>Qty</th><th>Total</th><th>Bill No.</th><th>Linked PR</th></tr></thead>
+                    <tbody id="pl-tbody"><tr><td colspan="9"><div class="load-center"><div class="spinner"></div>Loading…</div></td></tr></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── INDENT PAGE ── -->
+          <div class="page" id="page-indent">
+            <div class="page-header">
+              <div>
+                <div class="page-title">Indent</div>
+                <div class="page-subtitle">Issue items from stock</div>
+              </div>
+            </div>
+            <div class="stats-strip" id="indent-stats"></div>
+            <div class="split-2">
+              <div class="card">
+                <div class="card-header">
+                  <span class="card-title">New Indent</span>
+                  <span class="id-preview" id="indent-number-preview">Auto ID</span>
+                </div>
+                <div class="form-grid">
+                  <div class="form-group"><label>Indent Date *</label><input type="date" id="indent-date" /></div>
+                  <div class="form-group"><label>Location *</label><select id="indent-location"><option value="">Select…</option></select></div>
+                  <div class="form-group full"><label>Requested By</label><input type="text" id="indent-requested-by" placeholder="Name of requester" /></div>
+                  <div class="form-group full"><label>Item *</label><select id="indent-item" onchange="onIndentItemChange()"><option value="">Select item…</option></select></div>
+                  <div class="form-group full"><label>Item Description</label><input type="text" id="indent-item-desc" class="readonly-field" readonly /></div>
+                  <div class="form-group full">
+                    <label>PR Reference <span style="color:var(--ink3); font-size:.65rem; text-transform:none; letter-spacing:0">(optional)</span></label>
+                    <select id="indent-linked-pl"><option value="">— None —</option></select>
+                  </div>
+                  <div class="form-group"><label>Requested Qty *</label><input type="number" id="indent-req-qty" placeholder="0" /></div>
+                  <div class="form-group"><label>Issued Qty</label><input type="number" id="indent-iss-qty" placeholder="0" /></div>
+                  <div class="form-group"><label>Issued To</label><input type="text" id="indent-issued-to" /></div>
+                  <div class="form-group">
+                    <label for="usedAtAs">Used At / As</label>
+                    <select name="usedAtAs" required>
+                      <option value="" disabled selected hidden>-- Select an option --</option>
+                      <option value="School">School</option>
+                      <option value="Personal">Personal</option>
+                      <option value="Official">Official</option>
+                      <option value="Gift to Children">Gift to Children</option>
+                      <option value="Lost">Lost</option>
+                      <option value="Gift to Visitor">Gift to Visitor</option>
+                    </select>
+                    <!-- <label>Used At / As</label> -->
+                    <!-- <input type="text" id="indent-used-at" />< -->
+                  </div>
+                  <div class="form-group full"><label>Purpose of Use</label><input type="text" id="indent-purpose" /></div>
+                  <div class="form-group full"><label>Remarks</label><input type="text" id="indent-remarks" /></div>
+                </div>
+                <div class="form-actions">
+                  <button class="btn btn-primary" onclick="submitIndent()" id="btn-add-indent">＋ Submit Indent</button>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-header">
+                  <span class="card-title">All Indents</span>
+                  <span id="indent-count" class="badge badge-red">0</span>
+                </div>
+                <div class="search-wrap">
+                  <div class="search-inner">
+                    <span class="search-icon-abs">🔍</span>
+                    <input type="text" placeholder="Search…" oninput="filterTable('indent-table', this.value)" />
+                  </div>
+                </div>
+                <div class="table-wrap" style="max-height:600px; overflow-y:auto;">
+                  <table id="indent-table">
+                    <thead><tr><th>Indent No.</th><th>Date</th><th>Location</th><th>Requested By</th><th>Item</th><th>Req. Qty</th><th>Issued Qty</th><th>Linked PL</th><th>Purpose</th></tr></thead>
+                    <tbody id="indent-tbody"><tr><td colspan="9"><div class="load-center"><div class="spinner"></div>Loading…</div></td></tr></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MODALS ── -->
+  <div class="modal-overlay" id="approve-modal">
+    <div class="modal">
+      <div class="modal-title">✅ Approve PR</div>
+      <div class="modal-desc" id="approve-modal-desc">Approve this purchase requisition?</div>
+      <div class="modal-actions">
+        <button class="btn" style="background:var(--bg); color:var(--ink2);" onclick="closeModal('approve-modal')">Cancel</button>
+        <button class="btn btn-success" onclick="doApprove()">Approve</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="reject-modal">
+    <div class="modal">
+      <div class="modal-title">❌ Reject PR</div>
+      <div class="modal-desc" id="reject-modal-desc">Provide a reason for rejection.</div>
+      <div class="modal-field">
+        <label style="font-size:.7rem; text-transform:uppercase; letter-spacing:.05em; color:var(--ink3);">Reason *</label>
+        <input type="text" id="reject-reason" placeholder="e.g. Out of budget" />
+      </div>
+      <div class="modal-actions">
+        <button class="btn" style="background:var(--bg); color:var(--ink2);" onclick="closeModal('reject-modal')">Cancel</button>
+        <button class="btn btn-danger" onclick="doReject()">Reject</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="confirm-modal">
+    <div class="modal">
+      <div class="modal-title" id="confirm-title">Are you sure?</div>
+      <div class="modal-desc" id="confirm-desc">This action cannot be undone.</div>
+      <div class="modal-actions">
+        <button class="btn" style="background:var(--bg); color:var(--ink2);" onclick="closeModal('confirm-modal')">Cancel</button>
+        <button class="btn btn-danger" id="confirm-ok-btn" onclick="confirmOk()">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+  <script>
+// ─────────────────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────────────────
+let STATE = { items:[], catalogue:[], locations:[], prs:[], pls:[], indents:[], externalLink: null };
+let currentUser = null;
+let confirmCallback = null;
+let pendingApprovalPR = null;
+let pendingRejectPR   = null;
+let prFilter = 'All';
+let prSearch = '';
+
+// ─────────────────────────────────────────────────────────
+// SEARCHABLE COMBOBOX — PR Item
+// ─────────────────────────────────────────────────────────
+let prItemOptions = [];   // full list of item display strings
+let highlightedIndex = -1;
+
+function buildPRItemOptions() {
+  prItemOptions = STATE.items.map(i => i.display);
+}
+
+function openPRItemDropdown() {
+  const wrap = document.getElementById('pr-item-combobox');
+  wrap.classList.add('open');
+  renderPRItemDropdown(document.getElementById('pr-item-search').value);
+}
+
+function closePRItemDropdown() {
+  document.getElementById('pr-item-combobox').classList.remove('open');
+  highlightedIndex = -1;
+}
+
+function onPRItemSearch() {
+  const wrap = document.getElementById('pr-item-combobox');
+  wrap.classList.add('open');
+  // Clear the committed value when user edits text
+  document.getElementById('pr-item').value = '';
+  document.getElementById('pr-item-search').classList.remove('has-value');
+  document.getElementById('pr-item-desc').value = '';
+  document.getElementById('pr-availability').classList.remove('show');
+  highlightedIndex = -1;
+  renderPRItemDropdown(document.getElementById('pr-item-search').value);
+}
+
+function renderPRItemDropdown(query) {
+  const dropdown = document.getElementById('pr-item-dropdown');
+  const q = query.trim().toLowerCase();
+  const filtered = q
+    ? prItemOptions.filter(opt => opt.toLowerCase().includes(q))
+    : prItemOptions;
+
+  if (!filtered.length) {
+    dropdown.innerHTML = '<div class="combobox-empty">No items match</div>';
+    return;
+  }
+
+  dropdown.innerHTML = filtered.map((opt, idx) => {
+    const label = q ? opt.replace(new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi'), '<mark>$1</mark>') : opt;
+    return `<div class="combobox-option" data-value="${esc(opt)}" data-idx="${idx}"
+              onmousedown="selectPRItem('${esc(opt)}')">${label}</div>`;
+  }).join('');
+}
+
+function selectPRItem(value) {
+  document.getElementById('pr-item').value = value;
+  document.getElementById('pr-item-search').value = value;
+  document.getElementById('pr-item-search').classList.add('has-value');
+  closePRItemDropdown();
+  // Trigger the downstream logic (description + availability)
+  onPRItemChange();
+}
+
+function clearPRItemCombobox() {
+  document.getElementById('pr-item').value = '';
+  document.getElementById('pr-item-search').value = '';
+  document.getElementById('pr-item-search').classList.remove('has-value');
+  document.getElementById('pr-item-desc').value = '';
+  document.getElementById('pr-availability').classList.remove('show');
+  closePRItemDropdown();
+}
+
+// Keyboard navigation for the combobox
+document.addEventListener('DOMContentLoaded', function() {
+  const searchInput = document.getElementById('pr-item-search');
+  if (searchInput) {
+    searchInput.addEventListener('keydown', function(e) {
+      const dropdown = document.getElementById('pr-item-dropdown');
+      const options  = dropdown.querySelectorAll('.combobox-option');
+      if (!options.length) return;
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        highlightedIndex = Math.min(highlightedIndex + 1, options.length - 1);
+        updateHighlight(options);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        highlightedIndex = Math.max(highlightedIndex - 1, 0);
+        updateHighlight(options);
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (highlightedIndex >= 0 && options[highlightedIndex]) {
+          selectPRItem(options[highlightedIndex].dataset.value);
+        }
+      } else if (e.key === 'Escape') {
+        // Restore last committed value on escape
+        const committed = document.getElementById('pr-item').value;
+        document.getElementById('pr-item-search').value = committed;
+        closePRItemDropdown();
+      }
+    });
+  }
+});
+
+function updateHighlight(options) {
+  options.forEach((o, i) => o.classList.toggle('highlighted', i === highlightedIndex));
+  if (options[highlightedIndex]) options[highlightedIndex].scrollIntoView({ block: 'nearest' });
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(e) {
+  const wrap = document.getElementById('pr-item-combobox');
+  if (wrap && !wrap.contains(e.target)) {
+    // If no item committed, revert text to committed value
+    const committed = document.getElementById('pr-item').value;
+    document.getElementById('pr-item-search').value = committed;
+    if (!committed) document.getElementById('pr-item-search').classList.remove('has-value');
+    closePRItemDropdown();
+  }
+});
+
+// ─────────────────────────────────────────────────────────
+// AUTH
+// ─────────────────────────────────────────────────────────
+window.onload = function () {
+  google.script.run
+    .withSuccessHandler(function (user) {
+      if (!user) { showDenied('', 'No users have been added to the system yet.'); return; }
+      if (user.unauthorised) { showDenied(user.email, 'Your Google account is not authorised.'); return; }
+      currentUser = user;
+      activateApp();
+    })
+    .withFailureHandler(function (err) {
+      showDenied('', 'Could not verify your account. Try reloading. (' + err.message + ')');
+    })
+    .getCurrentUser();
+};
+
+function showDenied(email, msg) {
+  document.getElementById('loading-card-inner').innerHTML =
+    '<div class="loading-logo"><img src="https://shaishavchildrights.org/wp-content/uploads/2025/07/Shaishav-Trust-Bhavnagar-Logo-Final.jpg" alt="Shaishav Logo"> Shaishav</div>' +
+    '<div class="denied-icon">🔒</div>' +
+    '<div class="denied-title">Access Denied</div>' +
+    '<div class="denied-sub">' + msg + (email ? '<br><span class="denied-email">' + email + '</span>' : '') + '</div>';
+}
+
+function activateApp() {
+  document.getElementById('user-name-display').textContent = currentUser.username;
+  document.getElementById('user-avatar').textContent = currentUser.username.charAt(0).toUpperCase();
+  document.getElementById('greet-name').textContent = currentUser.username;
+  if (currentUser.role === 'admin') document.getElementById('admin-pill').style.display = '';
+  document.getElementById('sidebar').classList.remove('hidden');
+  document.getElementById('screen-loading').classList.remove('active');
+  document.getElementById('screen-loading').classList.add('hidden');
+  document.getElementById('screen-loading').parentNode.hidden = true;
+  document.getElementById("screen-loading").style.display = "none";
+  document.getElementById('screen-app').classList.add('active');
+  setDefaultDates();
+  google.script.run
+    .withSuccessHandler(data => { STATE = data; populateDropdowns(); renderAll(); })
+    .withFailureHandler(() => showToast('Failed to load data', 'error'))
+    .getInitData();
+}
+
+// ─────────────────────────────────────────────────────────
+// NAVIGATION
+// ─────────────────────────────────────────────────────────
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.getElementById('nav-' + name).classList.add('active');
+}
+function goHome() { showPage('home'); }
+
+function goToReportsPage() {
+  google.script.run
+    .withSuccessHandler(openReportsPage)
+    .withFailureHandler(() => showToast('Failed to goto reports page', 'error'))
+    .getLink('Reports');
+}
+
+function openReportsPage(url) {
+  console.log("reports url: " + url);
+  window.open(url, "_top");
+}
+
+function setDefaultDates() {
+  const today = new Date().toISOString().split('T')[0];
+  ['pr-date','pr-date-req','pl-date','pl-billing-date','indent-date'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = today;
+  });
+}
+
+// ─────────────────────────────────────────────────────────
+// DROPDOWNS
+// ─────────────────────────────────────────────────────────
+function populateDropdowns() {
+  const cats = [...new Set(STATE.catalogue.map(c => c.category))];
+  const catSel = document.getElementById('item-category');
+  catSel.innerHTML = '<option value="">Select category…</option>';
+  cats.forEach(c => catSel.innerHTML += `<option value="${c}">${c}</option>`);
+
+  ['pr-location','pl-location','indent-location'].forEach(id => {
+    const sel = document.getElementById(id);
+    sel.innerHTML = '<option value="">Select…</option>';
+    STATE.locations.forEach(l => sel.innerHTML += `<option value="${l}">${l}</option>`);
+  });
+
+  // PR item: populate combobox (not a <select>)
+  buildPRItemOptions();
+
+  // PL and Indent still use regular selects
+  ['pl-item','indent-item'].forEach(id => {
+    const sel = document.getElementById(id);
+    sel.innerHTML = '<option value="">Select item…</option>';
+    STATE.items.forEach(i => sel.innerHTML += `<option value="${i.display}">${i.display}</option>`);
+  });
+
+  const approvedPRs = STATE.prs.filter(p => p.status === 'Approved');
+  const plPRSel = document.getElementById('pl-linked-pr');
+  plPRSel.innerHTML = '<option value="">— None —</option>';
+  approvedPRs.forEach(p => plPRSel.innerHTML += `<option value="${p.prNumber}">${p.prNumber} — ${p.item} @ ${p.location}</option>`);
+
+  const indPLSel = document.getElementById('indent-linked-pl');
+  indPLSel.innerHTML = '<option value="">— None —</option>';
+  STATE.pls.forEach(p => indPLSel.innerHTML += `<option value="${p.plNumber}">${p.plNumber} — ${p.item}</option>`);
+}
+
+function onCategoryChange() {
+  const cat = document.getElementById('item-category').value;
+  const subs = STATE.catalogue.filter(c => c.category === cat).map(c => c.subcategory);
+  const sel = document.getElementById('item-subcategory');
+  sel.innerHTML = '<option value="">Select subcategory…</option>';
+  subs.forEach(s => sel.innerHTML += `<option value="${s}">${s}</option>`);
+  updateItemCodePreview();
+}
+
+function updateItemCodePreview() {
+  const cat = document.getElementById('item-category').value;
+  const sub = document.getElementById('item-subcategory').value;
+  const match = STATE.catalogue.find(c => c.category === cat && c.subcategory === sub);
+  const prefix = match ? match.code : '??';
+  const existing = STATE.items.filter(i => i.code.startsWith(prefix + '_'));
+  const nums = existing.map(i => parseInt(i.code.split('_').pop()) || 0);
+  const next = nums.length ? Math.max(...nums) + 1 : 1;
+  document.getElementById('item-code-preview').textContent = prefix + '_' + String(next).padStart(4,'0');
+}
+
+function updateCatCodePreview() {
+  const cat = document.getElementById('cat-category').value.trim();
+  const sub = document.getElementById('cat-subcategory').value.trim();
+  if (!cat || !sub) { document.getElementById('cat-code-preview').textContent = 'Auto Code'; return; }
+  const ci = cat.split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0,2);
+  const si = sub.split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0,1);
+  document.getElementById('cat-code-preview').textContent = ci + '_' + si;
+}
+
+// ─────────────────────────────────────────────────────────
+// PR ITEM / LOCATION CHANGE → Availability
+// ─────────────────────────────────────────────────────────
+function onPRLocationChange() { updatePRAvailability(); }
+
+function onPRItemChange() {
+  // reads from the hidden input #pr-item (set by selectPRItem)
+  const item = STATE.items.find(i => i.display === document.getElementById('pr-item').value);
+  document.getElementById('pr-item-desc').value = item ? item.description : '';
+  updatePRAvailability();
+}
+
+function updatePRAvailability() {
+  const itemDisplay = document.getElementById('pr-item').value;
+  const location    = document.getElementById('pr-location').value;
+  const panel       = document.getElementById('pr-availability');
+
+  if (!itemDisplay || !location) { panel.classList.remove('show'); return; }
+
+  const pls = STATE.pls.filter(p => p.item === itemDisplay && p.location === location);
+  const received = pls.reduce((s, p) => s + (parseFloat(p.qty) || 0), 0);
+
+  const indents = STATE.indents.filter(i => i.item === itemDisplay && i.location === location);
+  const issued = indents.reduce((s, i) => s + (parseFloat(i.issuedQty) || 0), 0);
+
+  const available = received - issued;
+
+  document.getElementById('avail-received').textContent = received;
+  document.getElementById('avail-issued').textContent   = issued;
+
+  const avEl = document.getElementById('avail-available');
+  avEl.textContent = available;
+  avEl.className = 'avail-stat-value ' + (available > 5 ? 'avail-ok' : available > 0 ? 'avail-warn' : 'avail-zero');
+
+  panel.classList.add('show');
+}
+
+function onPLItemChange() {
+  const item = STATE.items.find(i => i.display === document.getElementById('pl-item').value);
+  document.getElementById('pl-item-desc').value = item ? item.description : '';
+}
+function onIndentItemChange() {
+  const item = STATE.items.find(i => i.display === document.getElementById('indent-item').value);
+  document.getElementById('indent-item-desc').value = item ? item.description : '';
+}
+
+function calcBudget() {
+  const q = parseFloat(document.getElementById('pr-qty').value)||0;
+  const p = parseFloat(document.getElementById('pr-price').value)||0;
+  document.getElementById('pr-budget').value = (q*p).toLocaleString('en-IN',{minimumFractionDigits:2});
+}
+function calcTotal() {
+  const q = parseFloat(document.getElementById('pl-qty').value)||0;
+  const p = parseFloat(document.getElementById('pl-price').value)||0;
+  document.getElementById('pl-total').value = (q*p).toLocaleString('en-IN',{minimumFractionDigits:2});
+}
+
+// ─────────────────────────────────────────────────────────
+// SUBMIT HANDLERS
+// ─────────────────────────────────────────────────────────
+function submitCatalogue() {
+  const category = v('cat-category'), subcategory = v('cat-subcategory');
+  if (!category || !subcategory) return showToast('Both fields are required', 'error');
+  const btn = document.getElementById('btn-add-cat');
+  setLoading(btn, true);
+  google.script.run
+    .withSuccessHandler(res => {
+      setLoading(btn, false);
+      if (!res.success) return showToast(res.error, 'error');
+      showToast('Added: ' + res.code, 'success');
+      document.getElementById('cat-category').value = '';
+      document.getElementById('cat-subcategory').value = '';
+      document.getElementById('cat-code-preview').textContent = 'Auto Code';
+      refreshData();
+    })
+    .withFailureHandler(err => { setLoading(btn, false); showToast('Error: ' + err.message, 'error'); })
+    .addCatalogueEntry({ category, subcategory });
+}
+
+function deleteCatalogue(category, subcategory) {
+  openConfirm(
+    'Delete Catalogue Entry',
+    `Remove "${category} → ${subcategory}"? Items already using this code won't be affected.`,
+    () => {
+      google.script.run
+        .withSuccessHandler(res => {
+          if (!res.success) return showToast(res.error, 'error');
+          showToast('Entry deleted', 'success');
+          refreshData();
+        })
+        .withFailureHandler(err => showToast('Error: ' + err.message, 'error'))
+        .deleteCatalogueEntry(category, subcategory);
+    }
+  );
+}
+
+function submitItem() {
+  const name = v('item-name'), category = v('item-category'), subcategory = v('item-subcategory');
+  if (!name || !category || !subcategory) return showToast('Fill required fields', 'error');
+  const btn = document.getElementById('btn-add-item');
+  setLoading(btn, true);
+  google.script.run
+    .withSuccessHandler(res => {
+      setLoading(btn, false);
+      showToast('Item added: ' + res.itemCode, 'success');
+      clearFields(['item-name','item-type','item-desc','item-remarks']);
+      document.getElementById('item-category').value = '';
+      document.getElementById('item-subcategory').innerHTML = '<option value="">Select subcategory…</option>';
+      document.getElementById('item-code-preview').textContent = 'Auto ID';
+      refreshData();
+    })
+    .withFailureHandler(err => { setLoading(btn, false); showToast('Error: ' + err.message, 'error'); })
+    .addItem({ name, category, subcategory, type: v('item-type'), description: v('item-desc'), remarks: v('item-remarks') });
+}
+
+function submitPR() {
+  // Read item from the hidden input (committed by selectPRItem)
+  const itemVal = document.getElementById('pr-item').value;
+  if (!v('pr-date')||!v('pr-location')||!itemVal||!v('pr-qty')||!v('pr-date-req'))
+    return showToast('Fill required fields', 'error');
+  const btn = document.getElementById('btn-add-pr');
+  setLoading(btn, true);
+  google.script.run
+    .withSuccessHandler(res => {
+      setLoading(btn, false);
+      showToast('PR submitted: ' + res.prNumber, 'success');
+      clearFields(['pr-qty','pr-price','pr-purpose','pr-remarks','pr-budget','pr-item-desc']);
+      clearPRItemCombobox();
+      refreshData();
+    })
+    .withFailureHandler(err => { setLoading(btn, false); showToast('Error: ' + err.message, 'error'); })
+    .addPR({ prDate:v('pr-date'), location:v('pr-location'), item:itemVal, qty:v('pr-qty'), price:v('pr-price'), purpose:v('pr-purpose'), dateRequired:v('pr-date-req'), remarks:v('pr-remarks') });
+}
+
+function submitPL() {
+  if (!v('pl-location')||!v('pl-item')||!v('pl-qty')) return showToast('Fill required fields', 'error');
+  const btn = document.getElementById('btn-add-pl');
+  setLoading(btn, true);
+  google.script.run
+    .withSuccessHandler(res => {
+      setLoading(btn, false);
+      showToast('Entry added: ' + res.plNumber, 'success');
+      clearFields(['pl-source','pl-condition','pl-from','pl-qty','pl-price','pl-total','pl-bill-no','pl-remarks','pl-item-desc']);
+      document.getElementById('pl-item').value = '';
+      document.getElementById('pl-linked-pr').value = '';
+      refreshData();
+    })
+    .withFailureHandler(err => { setLoading(btn, false); showToast('Error: ' + err.message, 'error'); })
+    .addPL({ dateReceived:v('pl-date'), location:v('pl-location'), item:v('pl-item'), source:v('pl-source'), condition:v('pl-condition'), purchasedFrom:v('pl-from'), qty:v('pl-qty'), price:v('pl-price'), billingDate:v('pl-billing-date'), billNo:v('pl-bill-no'), remarks:v('pl-remarks'), linkedPR: v('pl-linked-pr') });
+}
+
+function submitIndent() {
+  if (!v('indent-date')||!v('indent-location')||!v('indent-item')||!v('indent-req-qty'))
+    return showToast('Fill required fields', 'error');
+  const btn = document.getElementById('btn-add-indent');
+  setLoading(btn, true);
+  google.script.run
+    .withSuccessHandler(res => {
+      setLoading(btn, false);
+      showToast('Indent submitted: ' + res.indentNo, 'success');
+      clearFields(['indent-requested-by','indent-req-qty','indent-iss-qty','indent-issued-to','indent-used-at','indent-purpose','indent-consumed-qty','indent-remarks','indent-item-desc']);
+      document.getElementById('indent-item').value = '';
+      document.getElementById('indent-linked-pl').value = '';
+      refreshData();
+    })
+    .withFailureHandler(err => { setLoading(btn, false); showToast('Error: ' + err.message, 'error'); })
+    .addIndent({ indentDate:v('indent-date'), location:v('indent-location'), requestedBy:v('indent-requested-by'), item:v('indent-item'), requestedQty:v('indent-req-qty'), issuedQty:v('indent-iss-qty'), issuedTo:v('indent-issued-to'), usedAt:v('indent-used-at'), purpose:v('indent-purpose'), consumedQty:v('indent-consumed-qty'), remarks:v('indent-remarks'), linkedPL: v('indent-linked-pl') });
+}
+
+// ─────────────────────────────────────────────────────────
+// PR WORKFLOW
+// ─────────────────────────────────────────────────────────
+function openApproveModal(prNumber) {
+  pendingApprovalPR = prNumber;
+  document.getElementById('approve-modal-desc').textContent = `Approve ${prNumber}?`;
+  document.getElementById('approve-modal').classList.add('show');
+}
+
+function doApprove() {
+  closeModal('approve-modal');
+  if (!pendingApprovalPR) return;
+  google.script.run
+    .withSuccessHandler(res => {
+      if (!res.success) return showToast(res.error, 'error');
+      showToast('PR approved ✓', 'success');
+      refreshData();
+    })
+    .withFailureHandler(err => showToast('Error: ' + err.message, 'error'))
+    .updatePRStatus(pendingApprovalPR, 'approve', '');
+  pendingApprovalPR = null;
+}
+
+function openRejectModal(prNumber) {
+  pendingRejectPR = prNumber;
+  document.getElementById('reject-modal-desc').textContent = `Reject ${prNumber}?`;
+  document.getElementById('reject-reason').value = '';
+  document.getElementById('reject-modal').classList.add('show');
+}
+
+function doReject() {
+  const reason = document.getElementById('reject-reason').value.trim();
+  if (!reason) { showToast('Please enter a reason', 'error'); return; }
+  closeModal('reject-modal');
+  if (!pendingRejectPR) return;
+  google.script.run
+    .withSuccessHandler(res => {
+      if (!res.success) return showToast(res.error, 'error');
+      showToast('PR rejected', 'success');
+      refreshData();
+    })
+    .withFailureHandler(err => showToast('Error: ' + err.message, 'error'))
+    .updatePRStatus(pendingRejectPR, 'reject', reason);
+  pendingRejectPR = null;
+}
+
+// ─────────────────────────────────────────────────────────
+// REFRESH
+// ─────────────────────────────────────────────────────────
+function refreshData() {
+  google.script.run
+    .withSuccessHandler(data => { STATE = data; populateDropdowns(); renderAll(); updatePRAvailability(); })
+    .withFailureHandler(() => showToast('Refresh failed', 'error'))
+    .getInitData();
+}
+
+// ─────────────────────────────────────────────────────────
+// RENDER
+// ─────────────────────────────────────────────────────────
+function renderAll() {
+  renderHome(); renderCatalogue(); renderItems(); renderPRs(); renderPLs(); renderIndents();
+}
+
+function renderHome() {
+  const pending = STATE.prs.filter(p => p.status === 'Pending').length;
+  document.getElementById('hs-items').textContent   = STATE.items.length;
+  document.getElementById('hs-prs').textContent     = STATE.prs.length;
+  document.getElementById('hs-pls').textContent     = STATE.pls.length;
+  document.getElementById('hs-indents').textContent = STATE.indents.length;
+  document.getElementById('hs-cats').textContent    = STATE.catalogue.length;
+  document.getElementById('hs-pending').textContent = pending;
+  document.getElementById('hc-catalogue').textContent = STATE.catalogue.length + ' entries';
+  document.getElementById('hc-items').textContent   = STATE.items.length + ' items';
+  document.getElementById('hc-prs').textContent     = STATE.prs.length + ' PRs';
+  document.getElementById('hc-pls').textContent     = STATE.pls.length + ' entries';
+  document.getElementById('hc-indents').textContent = STATE.indents.length + ' indents';
+}
+
+function renderCatalogue() {
+  const tbody = document.getElementById('cat-tbody');
+  const cat = STATE.catalogue;
+  document.getElementById('cat-count').textContent = cat.length;
+  if (!cat.length) {
+    tbody.innerHTML = `<tr><td colspan="4"><div class="empty"><div class="empty-icon">🗂</div><div class="empty-text">No catalogue entries yet</div></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = cat.map(c => `
+    <tr>
+      <td>${c.category}</td><td>${c.subcategory}</td>
+      <td><span class="badge badge-purple">${c.code}</span></td>
+      <td><button class="btn btn-danger btn-sm" onclick="deleteCatalogue('${esc(c.category)}','${esc(c.subcategory)}')">Delete</button></td>
+    </tr>`).join('');
+}
+
+function renderItems() {
+  const tbody = document.getElementById('items-tbody');
+  const items = STATE.items;
+  document.getElementById('items-count').textContent = items.length;
+  if (!items.length) {
+    tbody.innerHTML = `<tr><td colspan="5"><div class="empty"><div class="empty-icon">📦</div><div class="empty-text">No items yet</div></div></td></tr>`;
+    document.getElementById('items-stats').innerHTML = ''; return;
+  }
+  tbody.innerHTML = items.map(i => `
+    <tr>
+      <td><span class="badge badge-blue">${i.code}</span></td>
+      <td><strong>${i.name}</strong></td><td>${i.category}</td><td>${i.subcategory}</td>
+      <td style="color:var(--ink3); max-width:180px; overflow:hidden; text-overflow:ellipsis;">${i.description||'—'}</td>
+    </tr>`).join('');
+  const cats = {};
+  items.forEach(i => cats[i.category] = (cats[i.category]||0)+1);
+  document.getElementById('items-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-label">Total Items</div><div class="stat-value">${items.length}</div></div>
+    ${Object.entries(cats).map(([k,c])=>`<div class="stat-card"><div class="stat-label">${k}</div><div class="stat-value">${c}</div><div class="stat-sub">items</div></div>`).join('')}`;
+}
+
+function statusBadge(s) {
+  const map = { Pending:'status-pending', Approved:'status-approved', Rejected:'status-rejected', Fulfilled:'status-fulfilled' };
+  return `<span class="badge ${map[s]||'badge-gray'}">${s||'Pending'}</span>`;
+}
+
+function setPRFilter(f, el) {
+  prFilter = f;
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderPRs();
+}
+
+function filterPRTable(q) { prSearch = q.toLowerCase(); renderPRs(); }
+
+function renderPRs() {
+  const tbody = document.getElementById('pr-tbody');
+  let prs = STATE.prs;
+  document.getElementById('pr-count').textContent = prs.length;
+
+  const nums = prs.map(p=>parseInt(p.prNumber.split('_').pop())||0);
+  document.getElementById('pr-number-preview').textContent = 'PR_'+String((nums.length?Math.max(...nums)+1:1)).padStart(4,'0');
+
+  if (prFilter !== 'All') prs = prs.filter(p => (p.status||'Pending') === prFilter);
+  if (prSearch) prs = prs.filter(p => JSON.stringify(p).toLowerCase().includes(prSearch));
+
+  const isAdmin = currentUser && currentUser.role === 'admin';
+
+  if (!prs.length) {
+    tbody.innerHTML = `<tr><td colspan="9"><div class="empty"><div class="empty-icon">📋</div><div class="empty-text">No PRs match this filter</div></div></td></tr>`;
+    document.getElementById('pr-stats').innerHTML = ''; return;
+  }
+
+  tbody.innerHTML = prs.map(p => {
+    const status = p.status || 'Pending';
+    let actions = '';
+    if (isAdmin && status === 'Pending') {
+      actions = `
+        <button class="btn btn-success btn-sm" onclick="openApproveModal('${esc(p.prNumber)}')">✓ Approve</button>
+        <button class="btn btn-warn btn-sm" style="margin-left:.3rem;" onclick="openRejectModal('${esc(p.prNumber)}')">✗ Reject</button>`;
+    }
+    return `<tr>
+      <td><span class="badge badge-amber">${p.prNumber}</span></td>
+      <td>${p.prDate}</td><td>${p.location}</td>
+      <td style="max-width:130px; overflow:hidden; text-overflow:ellipsis;" title="${esc(p.item)}">${p.item}</td>
+      <td>${p.qty}</td>
+      <td>₹${Number(p.budget||0).toLocaleString('en-IN')}</td>
+      <td>${statusBadge(status)}</td>
+      <td>${p.createdByUser}</td>
+      <td>${p.approvedByUser}</td>
+      <td>${p.linkedPL ? `<span class="badge badge-blue">${p.linkedPL}</span>` : '—'}</td>
+      <td style="white-space:nowrap;">${actions}</td>
+    </tr>`;
+  }).join('');
+
+  const total = STATE.prs.reduce((s,p)=>s+(Number(p.budget)||0),0);
+  const byStatus = {};
+  STATE.prs.forEach(p => { const s = p.status||'Pending'; byStatus[s] = (byStatus[s]||0)+1; });
+  document.getElementById('pr-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-label">Total PRs</div><div class="stat-value">${STATE.prs.length}</div></div>
+    <div class="stat-card"><div class="stat-label">Total Budget</div><div class="stat-value">₹${total.toLocaleString('en-IN')}</div></div>
+    ${Object.entries(byStatus).map(([s,c])=>`<div class="stat-card"><div class="stat-label">${s}</div><div class="stat-value">${c}</div></div>`).join('')}`;
+}
+
+function renderPLs() {
+  const tbody = document.getElementById('pl-tbody');
+  const pls = STATE.pls;
+  document.getElementById('pl-count').textContent = pls.length;
+  const nums = pls.map(p=>parseInt(p.plNumber.split('_').pop())||0);
+  document.getElementById('pl-number-preview').textContent = 'PL_'+String((nums.length?Math.max(...nums)+1:1)).padStart(4,'0');
+  if (!pls.length) {
+    tbody.innerHTML = `<tr><td colspan="9"><div class="empty"><div class="empty-icon">🧾</div><div class="empty-text">No ledger entries yet</div></div></td></tr>`;
+    document.getElementById('pl-stats').innerHTML = ''; return;
+  }
+  tbody.innerHTML = pls.map(p=>`<tr>
+    <td><span class="badge badge-green">${p.plNumber}</span></td>
+    <td>${p.dateReceived||'—'}</td><td>${p.location}</td>
+    <td style="max-width:130px; overflow:hidden; text-overflow:ellipsis;">${p.item}</td>
+    <td>${p.source||'—'}</td><td>${p.qty||'—'}</td>
+    <td>₹${Number(p.total||0).toLocaleString('en-IN')}</td>
+    <td>${p.billNo||'—'}</td>
+    <td>${p.linkedPR ? `<span class="badge badge-amber">${p.linkedPR}</span>` : '—'}</td>
+  </tr>`).join('');
+  const total = pls.reduce((s,p)=>s+(Number(p.total)||0),0);
+  document.getElementById('pl-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-label">Total Entries</div><div class="stat-value">${pls.length}</div></div>
+    <div class="stat-card"><div class="stat-label">Total Value</div><div class="stat-value">₹${total.toLocaleString('en-IN')}</div><div class="stat-sub">received</div></div>`;
+}
+
+function renderIndents() {
+  const tbody = document.getElementById('indent-tbody');
+  const indents = STATE.indents;
+  document.getElementById('indent-count').textContent = indents.length;
+  const nums = indents.map(i=>parseInt(i.indentNo.split('_').pop())||0);
+  document.getElementById('indent-number-preview').textContent = 'IN_'+String((nums.length?Math.max(...nums)+1:1)).padStart(4,'0');
+  if (!indents.length) {
+    tbody.innerHTML = `<tr><td colspan="9"><div class="empty"><div class="empty-icon">📤</div><div class="empty-text">No indents yet</div></div></td></tr>`;
+    document.getElementById('indent-stats').innerHTML = ''; return;
+  }
+  tbody.innerHTML = indents.map(i=>`<tr>
+    <td><span class="badge badge-red">${i.indentNo}</span></td>
+    <td>${i.indentDate}</td><td>${i.location}</td><td>${i.requestedBy||'—'}</td>
+    <td style="max-width:130px; overflow:hidden; text-overflow:ellipsis;">${i.item}</td>
+    <td>${i.requestedQty}</td><td>${i.issuedQty||'—'}</td>
+    <td>${i.linkedPL ? `<span class="badge badge-green">${i.linkedPL}</span>` : '—'}</td>
+    <td>${i.purpose||'—'}</td>
+  </tr>`).join('');
+  const issued = indents.reduce((s,i)=>s+(Number(i.issuedQty)||0),0);
+  document.getElementById('indent-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-label">Total Indents</div><div class="stat-value">${indents.length}</div></div>
+    <div class="stat-card"><div class="stat-label">Total Issued</div><div class="stat-value">${issued}</div><div class="stat-sub">units issued</div></div>`;
+}
+
+// ─────────────────────────────────────────────────────────
+// TABLE FILTER
+// ─────────────────────────────────────────────────────────
+function filterTable(tableId, query) {
+  const q = query.toLowerCase();
+  document.getElementById(tableId).querySelectorAll('tbody tr').forEach(row => {
+    row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+// ─────────────────────────────────────────────────────────
+// MODALS
+// ─────────────────────────────────────────────────────────
+function openConfirm(title, desc, cb) {
+  document.getElementById('confirm-title').textContent = title;
+  document.getElementById('confirm-desc').textContent = desc;
+  confirmCallback = cb;
+  document.getElementById('confirm-modal').classList.add('show');
+}
+function confirmOk() { closeModal('confirm-modal'); if (confirmCallback) confirmCallback(); confirmCallback = null; }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+// ─────────────────────────────────────────────────────────
+// UTILS
+// ─────────────────────────────────────────────────────────
+function v(id) { return document.getElementById(id).value.trim(); }
+function clearFields(ids) { ids.forEach(id => { const el = document.getElementById(id); if(el) el.value=''; }); }
+function esc(str) { return String(str).replace(/'/g,"\\'"); }
+
+function setLoading(btn, loading) {
+  if (loading) { btn._orig = btn.innerHTML; btn.innerHTML = '<div class="spinner"></div> Saving…'; btn.disabled = true; }
+  else { btn.innerHTML = btn._orig; btn.disabled = false; }
+}
+
+let toastTimer;
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = (type==='success'?'✓  ':'✗  ') + msg;
+  t.className = 'show ' + type;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.className = '', 3500);
+}
+  </script>
+</body>
+</html>
