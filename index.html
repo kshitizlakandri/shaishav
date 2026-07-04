@@ -1343,18 +1343,24 @@ document.addEventListener('click', function(e) {
 // ─────────────────────────────────────────────────────────
 // AUTH
 // ─────────────────────────────────────────────────────────
+async function getUserFromEmail(email) {
+  const { data, error } = await supabaseClient.rpc('get_user_from_email', { p_email: email });
+  console.log(data);
+}
+
 async function checkUser() {
-      const { data: { user } } = await supabaseClient.auth.getUser();
-      if (user) {
-        console.log(user)
-        // output.textContent = "Logged in user:\n" + JSON.stringify(user, null, 2);
-      } else {
-        // output.textContent = "Not logged in";
-          supabaseClient.auth.signInWithOAuth({
-          provider: "google"
-        });
-      }
-    }
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  if (user) {
+    console.log(user)
+    getUserFromEmail(user.email)
+    // output.textContent = "Logged in user:\n" + JSON.stringify(user, null, 2);
+  } else {
+    // output.textContent = "Not logged in";
+      supabaseClient.auth.signInWithOAuth({
+      provider: "google"
+    });
+  }
+}
 
 window.onload = function () {
 
