@@ -1345,18 +1345,15 @@ document.addEventListener('click', function(e) {
 // ─────────────────────────────────────────────────────────
 async function getUserFromEmail(email) {
   const { data, error } = await supabaseClient.rpc('get_user_from_email', { p_email: email });
-  console.log(data); 
-  return data;
+  console.log(data);
 }
 
 async function checkUser() {
   const { data: { user } } = await supabaseClient.auth.getUser();
   if (user) {
-    console.log(user);
-    const userData = getUserFromEmail(user.email);
-    console.log(userData);
-    console.log(getUserFromEmail(user.email));
-    // activateApp(userData);
+    console.log(user)
+    getUserFromEmail(user.email)
+    // currentUser =
     // output.textContent = "Logged in user:\n" + JSON.stringify(user, null, 2);
   } else {
     // output.textContent = "Not logged in";
@@ -1391,11 +1388,11 @@ function showDenied(email, msg) {
     '<div class="denied-sub">' + msg + (email ? '<br><span class="denied-email">' + email + '</span>' : '') + '</div>';
 }
 
-function activateApp(currentUser) {
+function activateApp() {
   document.getElementById('user-name-display').textContent = currentUser.username;
   document.getElementById('user-avatar').textContent = currentUser.username.charAt(0).toUpperCase();
   document.getElementById('greet-name').textContent = currentUser.username;
-  if (currentUser.role === 'A') document.getElementById('admin-pill').style.display = '';
+  if (currentUser.role === 'admin') document.getElementById('admin-pill').style.display = '';
   document.getElementById('sidebar').classList.remove('hidden');
   document.getElementById('screen-loading').classList.remove('active');
   document.getElementById('screen-loading').classList.add('hidden');
