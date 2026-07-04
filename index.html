@@ -1352,7 +1352,11 @@ async function checkUser() {
   const { data: { user } } = await supabaseClient.auth.getUser();
   if (user) {
     console.log(user)
-    getUserFromEmail(user.email)
+    const userData = getUserFromEmail(user.email)
+    currentUser = {
+      username: userData.username,
+      role: userData.role
+    }
     // output.textContent = "Logged in user:\n" + JSON.stringify(user, null, 2);
   } else {
     // output.textContent = "Not logged in";
@@ -1391,7 +1395,7 @@ function activateApp() {
   document.getElementById('user-name-display').textContent = currentUser.username;
   document.getElementById('user-avatar').textContent = currentUser.username.charAt(0).toUpperCase();
   document.getElementById('greet-name').textContent = currentUser.username;
-  if (currentUser.role === 'admin') document.getElementById('admin-pill').style.display = '';
+  if (currentUser.role === 'A') document.getElementById('admin-pill').style.display = '';
   document.getElementById('sidebar').classList.remove('hidden');
   document.getElementById('screen-loading').classList.remove('active');
   document.getElementById('screen-loading').classList.add('hidden');
