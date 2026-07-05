@@ -1355,6 +1355,7 @@ async function checkUser() {
     console.log(user);
     const userData = await getUserFromEmail(user.email);
     console.log(userData);
+    activateApp(userData);
     // currentUser =
     // output.textContent = "Logged in user:\n" + JSON.stringify(user, null, 2);
   } else {
