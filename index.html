@@ -1352,8 +1352,9 @@ async function getUserFromEmail(email) {
 async function checkUser() {
   const { data: { user } } = await supabaseClient.auth.getUser();
   if (user) {
-    console.log(user)
-    const userData = await getUserFromEmail(user.email)
+    console.log(user);
+    const userData = await getUserFromEmail(user.email);
+    console.log(userData);
     // currentUser =
     // output.textContent = "Logged in user:\n" + JSON.stringify(user, null, 2);
   } else {
