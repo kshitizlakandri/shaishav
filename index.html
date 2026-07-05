@@ -1391,7 +1391,7 @@ function showDenied(email, msg) {
     '<div class="denied-sub">' + msg + (email ? '<br><span class="denied-email">' + email + '</span>' : '') + '</div>';
 }
 
-function activateApp() {
+function activateApp(currentUser) {
   document.getElementById('user-name-display').textContent = currentUser.username;
   document.getElementById('user-avatar').textContent = currentUser.username.charAt(0).toUpperCase();
   document.getElementById('greet-name').textContent = currentUser.username;
