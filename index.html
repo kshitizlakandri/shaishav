@@ -1346,13 +1346,14 @@ document.addEventListener('click', function(e) {
 async function getUserFromEmail(email) {
   const { data, error } = await supabaseClient.rpc('get_user_from_email', { p_email: email });
   console.log(data);
+  return data;
 }
 
 async function checkUser() {
   const { data: { user } } = await supabaseClient.auth.getUser();
   if (user) {
     console.log(user)
-    getUserFromEmail(user.email)
+    const userData = await getUserFromEmail(user.email)
     // currentUser =
     // output.textContent = "Logged in user:\n" + JSON.stringify(user, null, 2);
   } else {
