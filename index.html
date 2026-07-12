@@ -680,12 +680,129 @@
       font-weight: 700;
     }
 
+    .combobox-option.combobox-create {
+      color: var(--green);
+      font-weight: 600;
+      background: #f4fbf7;
+    }
+
+    .combobox-option.combobox-create:hover,
+    .combobox-option.combobox-create.highlighted {
+      background: #dcfce7;
+      color: #145f3c;
+    }
+
     .combobox-empty {
       padding: .75rem .8rem;
       font-size: .82rem;
       color: var(--ink3);
       text-align: center;
     }
+
+    /* ─── SIDEBAR LOGOUT ─── */
+    .sidebar-logout-wrap {
+      padding: .6rem .6rem;
+      border-bottom: 1px solid rgba(255, 255, 255, .08);
+    }
+
+    .sidebar-logout-btn {
+      font-family: 'Syne', sans-serif;
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, .55);
+      background: transparent;
+      border: 1.5px solid rgba(255, 255, 255, .14);
+      padding: .5rem .75rem;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: all .18s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: .4rem;
+      width: 100%;
+    }
+ 
+    .sidebar-logout-btn:hover {
+      color: #fff;
+      background: rgba(232, 65, 30, .18);
+      border-color: rgba(232, 65, 30, .4);
+    }
+
+    /* ─── ITEM/CATEGORY MERGED PAGE ─── */
+    .subtab-row {
+      display: flex;
+      gap: .5rem;
+      margin-bottom: 1.2rem;
+    }
+    .subtab-btn {
+      font-family: 'Syne', sans-serif;
+      font-size: .74rem;
+      font-weight: 700;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      padding: .55rem 1.1rem;
+      border-radius: 8px;
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      color: var(--ink3);
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .subtab-btn.active {
+      background: var(--ink);
+      color: #fff;
+      border-color: var(--ink);
+    }
+    .subtab-btn:hover:not(.active) {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ─── INDENT TRANSACTION TOGGLE ─── */
+    .txn-toggle {
+      display: flex;
+      gap: .5rem;
+      padding: 1.1rem 1.3rem 0;
+    }
+    .txn-toggle-btn {
+      flex: 1;
+      font-family: 'Syne', sans-serif;
+      font-size: .78rem;
+      font-weight: 700;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      padding: .7rem .8rem;
+      border-radius: 8px;
+      border: 1.5px solid var(--border);
+      background: var(--bg);
+      color: var(--ink3);
+      cursor: pointer;
+      transition: all .15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: .4rem;
+    }
+    .txn-toggle-btn.active[data-txn="issue"] {
+      background: var(--accent2);
+      color: #fff;
+      border-color: var(--accent2);
+    }
+    .txn-toggle-btn.active[data-txn="receive"] {
+      background: var(--green);
+      color: #fff;
+      border-color: var(--green);
+    }
+    .txn-toggle-btn:hover:not(.active) {
+      border-color: var(--ink3);
+      color: var(--ink2);
+    }
+
+    .txn-section { display: none; }
+    .txn-section.show { display: contents; }
 
     /* ─── RESPONSIVE ─── */
     @media (max-width: 860px) {
@@ -698,6 +815,8 @@
       nav button { justify-content: center; padding: .55rem; width: auto; }
       .sidebar-ext-link { padding: .5rem .35rem; display: flex; justify-content: center; }
       .sidebar-ext-link a { padding: .5rem; justify-content: center; }
+      .sidebar-logout-wrap { padding: .5rem .35rem; }
+      .sidebar-logout-btn span { display: none; }
     }
 
     @media (max-width: 540px) {
@@ -717,7 +836,7 @@
     <div class="screen active" id="screen-loading">
       <div class="loading-card" id="loading-card-inner">
         <div class="loading-logo">
-          <img src="https://shaishavchildrights.org/wp-content/uploads/2025/07/Shaishav-Trust-Bhavnagar-Logo-Final.jpg" alt="Shaishav Logo"> Shaishav
+          <img src="shaishav_logo.png" alt="Shaishav Logo"> Shaishav
         </div>
         <div class="loading-spinner-wrap"><div class="spinner"></div></div>
         <div class="loading-msg">Verifying your access…</div>
@@ -732,7 +851,7 @@
       <!-- ── SIDEBAR ── -->
       <aside id="sidebar" class="hidden">
         <div class="sidebar-logo" onclick="goHome()">
-          <img src="https://shaishavchildrights.org/wp-content/uploads/2025/07/Shaishav-Trust-Bhavnagar-Logo-Final.jpg" alt="Shaishav Logo">
+          <img src="shaishav_logo.png" alt="Shaishav Logo">
           <span>Shaishav</span>
         </div>
 
@@ -744,11 +863,16 @@
           </div>
         </div>
 
+        <div class="sidebar-logout-wrap">
+          <button class="sidebar-logout-btn" onclick="handleLogout()">
+            <span>← Logout</span>
+          </button>
+        </div>
+
         <nav id="main-nav">
           <button onclick="showPage('home')"      id="nav-home">🏠 <span>Home</span></button>
-          <button onclick="showPage('catalogue')" id="nav-catalogue">🗂 <span>Category Master</span></button>
           <button onclick="showPage('items')"     id="nav-items">📦 <span>Item Master</span></button>
-          <button onclick="showPage('pr')"        id="nav-pr">📋 <span>PR</span></button>
+          <button onclick="showPage('pr')"        id="nav-pr">📋 <span>Purchase Requisition</span></button>
           <button onclick="showPage('pl')"        id="nav-pl">🧾 <span>Purchase Order</span></button>
           <button onclick="showPage('indent')"    id="nav-indent">📤 <span>Indent</span></button>
           <button onclick="goToReportsPage()"    id="nav-reports">📊 <span>Reports</span></button>
@@ -782,16 +906,10 @@
             </div>
             <div class="home-menu-title">Modules</div>
             <div class="home-grid">
-              <div class="home-card" style="--card-accent:#6d28d9" onclick="showPage('catalogue')">
-                <div class="home-card-icon">🗂</div>
-                <div class="home-card-title">Category Master</div>
-                <div class="home-card-desc">Manage categories and subcategories with auto-generated codes.</div>
-                <div class="home-card-count" style="background:rgba(109,40,217,.08); color:#6d28d9;" id="hc-catalogue">— entries</div>
-              </div>
               <div class="home-card" style="--card-accent:var(--accent)" onclick="showPage('items')">
                 <div class="home-card-icon">📦</div>
-                <div class="home-card-title">Items Master</div>
-                <div class="home-card-desc">Add and manage all inventory items with auto item codes.</div>
+                <div class="home-card-title">Item Master</div>
+                <div class="home-card-desc">Manage items, categories and subcategories with auto-generated codes.</div>
                 <div class="home-card-count" id="hc-items">— items</div>
               </div>
               <div class="home-card" style="--card-accent:#92400e" onclick="showPage('pr')">
@@ -809,61 +927,18 @@
               <div class="home-card" style="--card-accent:var(--accent2)" onclick="showPage('indent')">
                 <div class="home-card-icon">📤</div>
                 <div class="home-card-title">Indent</div>
-                <div class="home-card-desc">Issue items from stock and track requested vs issued vs consumed.</div>
+                <div class="home-card-desc">Issue items from stock, or record returned items coming back in.</div>
                 <div class="home-card-count" style="background:rgba(232,65,30,.08); color:var(--accent2);" id="hc-indents">— indents</div>
               </div>
             </div>
           </div>
 
-          <!-- ── CATALOGUE PAGE ── -->
-          <div class="page" id="page-catalogue">
-            <div class="page-header">
-              <div>
-                <div class="page-title">Category Master</div>
-                <div class="page-subtitle">Manage categories, subcategories and their codes</div>
-              </div>
-            </div>
-            <div class="split-equal">
-              <div class="card">
-                <div class="card-header">
-                  <span class="card-title">Add New Entry</span>
-                  <span class="id-preview" id="cat-code-preview">Auto Code</span>
-                </div>
-                <div class="form-grid">
-                  <div class="form-group"><label>Category *</label><input type="text" id="cat-category" placeholder="e.g. Stationery" oninput="updateCatCodePreview()" /></div>
-                  <div class="form-group"><label>Subcategory *</label><input type="text" id="cat-subcategory" placeholder="e.g. Educational" oninput="updateCatCodePreview()" /></div>
-                </div>
-                <div class="form-actions">
-                  <button class="btn btn-primary" onclick="submitCatalogue()" id="btn-add-cat">＋ Add Entry</button>
-                </div>
-              </div>
-              <div class="card">
-                <div class="card-header">
-                  <span class="card-title">All Catalogue Entries</span>
-                  <span id="cat-count" class="badge badge-purple">0</span>
-                </div>
-                <div class="search-wrap">
-                  <div class="search-inner">
-                    <span class="search-icon-abs">🔍</span>
-                    <input type="text" placeholder="Search catalogue…" oninput="filterTable('cat-table', this.value)" />
-                  </div>
-                </div>
-                <div class="table-wrap" style="max-height:420px; overflow-y:auto;">
-                  <table id="cat-table">
-                    <thead><tr><th>Category</th><th>Subcategory</th><th>Code</th><th></th></tr></thead>
-                    <tbody id="cat-tbody"><tr><td colspan="4"><div class="load-center"><div class="spinner"></div>Loading…</div></td></tr></tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- ── ITEMS PAGE ── -->
+          <!-- ── ITEMS + CATEGORY MASTER PAGE (merged) ── -->
           <div class="page" id="page-items">
             <div class="page-header">
               <div>
-                <div class="page-title">Items Master</div>
-                <div class="page-subtitle">Add and manage inventory items</div>
+                <div class="page-title">Item Master</div>
+                <div class="page-subtitle">Add items, plus their categories and subcategories, from one place</div>
               </div>
             </div>
             <div class="stats-strip" id="items-stats"></div>
@@ -875,13 +950,58 @@
                 </div>
                 <div class="form-grid">
                   <div class="form-group"><label>Item Name *</label><input type="text" id="item-name" placeholder="e.g. Pencil" /></div>
+
+                  <!-- ── SEARCHABLE CATEGORY COMBOBOX (creatable) ── -->
                   <div class="form-group">
-                    <label>Category *</label><select id="item-category" onchange="onCategoryChange()"><option value="">Select category…</option></select>
+                    <label>Category *</label>
+                    <div class="combobox-wrap" id="cat-category-combobox">
+                      <div class="combobox-input-wrap">
+                        <input
+                          type="text"
+                          class="combobox-input"
+                          id="cat-category-search"
+                          placeholder="Type to search or add category…"
+                          autocomplete="off"
+                          oninput="onCatComboSearch('category')"
+                          onfocus="openCatCombobox('category')"
+                        />
+                        <span class="combobox-chevron">▼</span>
+                      </div>
+                      <div class="combobox-dropdown" id="cat-category-dropdown"></div>
+                      <input type="hidden" id="item-category" onchange="onCategoryChange()" />
+                    </div>
                   </div>
+
+                  <!-- ── SEARCHABLE SUBCATEGORY COMBOBOX (creatable) ── -->
                   <div class="form-group">
-                    <label>Subcategory *</label><select id="item-subcategory" onchange="updateItemCodePreview()"><option value="">Select subcategory…</option></select>
+                    <label>Subcategory *</label>
+                    <div class="combobox-wrap" id="cat-subcategory-combobox">
+                      <div class="combobox-input-wrap">
+                        <input
+                          type="text"
+                          class="combobox-input"
+                          id="cat-subcategory-search"
+                          placeholder="Select a category first…"
+                          autocomplete="off"
+                          oninput="onCatComboSearch('subcategory')"
+                          onfocus="openCatCombobox('subcategory')"
+                        />
+                        <span class="combobox-chevron">▼</span>
+                      </div>
+                      <div class="combobox-dropdown" id="cat-subcategory-dropdown"></div>
+                      <input type="hidden" id="item-subcategory" onchange="updateItemCodePreview()" />
+                    </div>
                   </div>
-                  <div class="form-group"><label>Item Type</label><input type="text" id="item-type" placeholder="e.g. Consumable" /></div>
+
+                  <div class="form-group">
+                    <label for="itemType">Item Type *</label>
+                    <select name="itemType" id="item-type" required>
+                      <option value="" disabled selected hidden>Consumable / Resuable</option>
+                      <option value="Consumable">Consumable</option>
+                      <option value="Resusable">Resusable</option>
+                    </select>
+                    <!-- <label>Item Type</label><input type="text" id="item-type" placeholder="e.g. Consumable" /> -->
+                  </div>
                   <div class="form-group full"><label>Description</label><textarea id="item-desc" placeholder="Brief description…"></textarea></div>
                   <div class="form-group full"><label>Remarks</label><input type="text" id="item-remarks" placeholder="Any remarks…" /></div>
                 </div>
@@ -891,19 +1011,27 @@
               </div>
               <div class="card">
                 <div class="card-header">
-                  <span class="card-title">All Items</span>
+                  <span class="card-title" id="items-list-title">All Items</span>
                   <span id="items-count" class="badge badge-blue">0</span>
+                </div>
+                <div class="subtab-row" style="padding:.85rem 1rem 0;">
+                  <button class="subtab-btn active" id="items-subtab-items" onclick="setItemsSubtab('items')">Items</button>
+                  <button class="subtab-btn" id="items-subtab-categories" onclick="setItemsSubtab('categories')">Categories</button>
                 </div>
                 <div class="search-wrap">
                   <div class="search-inner">
                     <span class="search-icon-abs">🔍</span>
-                    <input type="text" placeholder="Search items…" oninput="filterTable('items-table', this.value)" />
+                    <input type="text" id="items-list-search" placeholder="Search items…" oninput="filterTable(currentItemsSubtab==='items' ? 'items-table' : 'cat-table', this.value)" />
                   </div>
                 </div>
                 <div class="table-wrap" style="max-height:480px; overflow-y:auto;">
                   <table id="items-table">
                     <thead><tr><th>Code</th><th>Name</th><th>Category</th><th>Subcategory</th><th>Description</th></tr></thead>
                     <tbody id="items-tbody"><tr><td colspan="5"><div class="load-center"><div class="spinner"></div>Loading…</div></td></tr></tbody>
+                  </table>
+                  <table id="cat-table" style="display:none;">
+                    <thead><tr><th>Category</th><th>Subcategory</th><th>Code</th><th></th></tr></thead>
+                    <tbody id="cat-tbody"><tr><td colspan="4"><div class="load-center"><div class="spinner"></div>Loading…</div></td></tr></tbody>
                   </table>
                 </div>
               </div>
@@ -926,12 +1054,12 @@
                   <span class="id-preview" id="pr-number-preview">Auto ID</span>
                 </div>
                 <div class="form-grid">
-                  <div class="form-group"><label>PR Date *</label><input type="date" id="pr-date" /></div>
+                  <div class="form-group"><label>PR Date *</label><input type="date" id="pr-date" readonly></div>
                   <div class="form-group">
                     <label>Location *</label><select id="pr-location" onchange="onPRLocationChange()"><option value="">Select…</option></select>
                   </div>
 
-                  <!-- ── SEARCHABLE ITEM COMBOBOX (PR page only) ── -->
+                  <!-- ── SEARCHABLE ITEM COMBOBOX ── -->
                   <div class="form-group full">
                     <label>Item *</label>
                     <div class="combobox-wrap" id="pr-item-combobox">
@@ -942,8 +1070,8 @@
                           id="pr-item-search"
                           placeholder="Type to search items…"
                           autocomplete="off"
-                          oninput="onPRItemSearch()"
-                          onfocus="openPRItemDropdown()"
+                          oninput="onComboboxSearch('pr')"
+                          onfocus="openComboboxDropdown('pr')"
                         />
                         <span class="combobox-chevron">▼</span>
                       </div>
@@ -957,9 +1085,9 @@
                 <div class="availability-panel" id="pr-availability">
                   <div class="avail-header">📊 Stock at selected location</div>
                   <div class="avail-body">
-                    <div class="avail-stat"><div class="avail-stat-label">Received</div><div class="avail-stat-value" id="avail-received">—</div></div>
-                    <div class="avail-stat"><div class="avail-stat-label">Issued</div><div class="avail-stat-value" id="avail-issued">—</div></div>
-                    <div class="avail-stat"><div class="avail-stat-label">Available</div><div class="avail-stat-value" id="avail-available">—</div></div>
+                    <div class="avail-stat"><div class="avail-stat-label">Received</div><div class="avail-stat-value" id="pr-avail-received">—</div></div>
+                    <div class="avail-stat"><div class="avail-stat-label">Issued</div><div class="avail-stat-value" id="pr-avail-issued">—</div></div>
+                    <div class="avail-stat"><div class="avail-stat-label">Available</div><div class="avail-stat-value" id="pr-avail-available">—</div></div>
                   </div>
                 </div>
 
@@ -1028,16 +1156,38 @@
                 </div>
                 <div class="form-grid">
                   <div class="form-group"><label>Date Received</label><input type="date" id="pl-date" /></div>
-                  <div class="form-group"><label>Location *</label><select id="pl-location"><option value="">Select…</option></select></div>
-                  <div class="form-group full"><label>Item *</label><select id="pl-item" onchange="onPLItemChange()"><option value="">Select item…</option></select></div>
-                  <div class="form-group full"><label>Item Description</label><input type="text" id="pl-item-desc" class="readonly-field" readonly /></div>
                   <div class="form-group full">
                     <label>PR Reference <span style="color:var(--ink3); font-size:.65rem; text-transform:none; letter-spacing:0">(optional)</span></label>
-                    <select id="pl-linked-pr"><option value="">— None —</option></select>
+                    <select id="pl-linked-pr" onchange="onPLPRReferenceChange()"><option value="">— None —</option></select>
                   </div>
+                  <div class="form-group"><label>Location *</label><select id="pl-location"><option value="">Select…</option></select></div>
+
+                  <!-- ── SEARCHABLE ITEM COMBOBOX ── -->
+                  <div class="form-group full">
+                    <label>Item *</label>
+                    <div class="combobox-wrap" id="pl-item-combobox">
+                      <div class="combobox-input-wrap">
+                        <input
+                          type="text"
+                          class="combobox-input"
+                          id="pl-item-search"
+                          placeholder="Type to search items…"
+                          autocomplete="off"
+                          oninput="onComboboxSearch('pl')"
+                          onfocus="openComboboxDropdown('pl')"
+                        />
+                        <span class="combobox-chevron">▼</span>
+                      </div>
+                      <div class="combobox-dropdown" id="pl-item-dropdown"></div>
+                      <input type="hidden" id="pl-item" />
+                    </div>
+                  </div>
+
+                  <div class="form-group full"><label>Item Description</label><input type="text" id="pl-item-desc" class="readonly-field" readonly /></div>
+                  
                   <div class="form-group">
-                    <label for="source">Source</label>
-                    <select name="source" required>
+                    <label for="source">Source *</label>
+                    <select name="source" id="pl-source" required>
                       <option value="" disabled selected hidden>Donation / Purchase</option>
                       <option value="Donation">Donation</option>
                       <option value="Purchase">Purchase</option>
@@ -1046,16 +1196,16 @@
                     <input type="text" id="pl-source" placeholder="Donation / Purchase" /> -->
                   </div>
                   <div class="form-group">
-                    <label for="condition">Condition</label>
-                    <select name="condition" required>
+                    <label for="condition">Condition *</label>
+                    <select name="condition" id="pl-condition" required>
                       <option value="" disabled selected hidden>New / Used</option>
                       <option value="New">New</option>
                       <option value="Used">Used</option>
                     </select>
                   </div>
-                  <div class="form-group full"><label>Purchased / Received From</label><input type="text" id="pl-from" placeholder="Vendor or donor name" /></div>
+                  <div class="form-group full"><label>Purchased / Received From *</label><input type="text" id="pl-from" placeholder="Vendor or donor name" /></div>
                   <div class="form-group"><label>Quantity *</label><input type="number" id="pl-qty" placeholder="0" oninput="calcTotal()" /></div>
-                  <div class="form-group"><label>Price / Unit</label><input type="number" id="pl-price" placeholder="0.00" oninput="calcTotal()" /></div>
+                  <div class="form-group"><label>Price / Unit *</label><input type="number" id="pl-price" placeholder="0.00" oninput="calcTotal()" /></div>
                   <div class="form-group"><label>Total (Auto)</label><input type="text" id="pl-total" class="readonly-field" readonly /></div>
                   <div class="form-group"><label>Billing Date</label><input type="date" id="pl-billing-date" /></div>
                   <div class="form-group full"><label>Bill / Receipt / Indent No.</label><input type="text" id="pl-bill-no" placeholder="e.g. BILL-001" /></div>
@@ -1091,32 +1241,73 @@
             <div class="page-header">
               <div>
                 <div class="page-title">Indent</div>
-                <div class="page-subtitle">Issue items from stock</div>
+                <div class="page-subtitle">Issue items from stock, or record a returned item coming back in</div>
               </div>
             </div>
             <div class="stats-strip" id="indent-stats"></div>
             <div class="split-2">
               <div class="card">
                 <div class="card-header">
-                  <span class="card-title">New Indent</span>
+                  <span class="card-title">New Transaction</span>
                   <span class="id-preview" id="indent-number-preview">Auto ID</span>
                 </div>
+
+                <!-- ── ISSUE / RECEIVE TOGGLE ── -->
+                <div class="txn-toggle">
+                  <button type="button" class="txn-toggle-btn active" data-txn="issue" id="indent-txn-issue-btn" onclick="setIndentTxnType('issue')">📤 Issued</button>
+                  <button type="button" class="txn-toggle-btn" data-txn="receive" id="indent-txn-receive-btn" onclick="setIndentTxnType('receive')">📥 Received</button>
+                </div>
+
                 <div class="form-grid">
                   <div class="form-group"><label>Indent Date *</label><input type="date" id="indent-date" /></div>
-                  <div class="form-group"><label>Location *</label><select id="indent-location"><option value="">Select…</option></select></div>
-                  <div class="form-group full"><label>Requested By</label><input type="text" id="indent-requested-by" placeholder="Name of requester" /></div>
-                  <div class="form-group full"><label>Item *</label><select id="indent-item" onchange="onIndentItemChange()"><option value="">Select item…</option></select></div>
-                  <div class="form-group full"><label>Item Description</label><input type="text" id="indent-item-desc" class="readonly-field" readonly /></div>
-                  <div class="form-group full">
-                    <label>PR Reference <span style="color:var(--ink3); font-size:.65rem; text-transform:none; letter-spacing:0">(optional)</span></label>
-                    <select id="indent-linked-pl"><option value="">— None —</option></select>
+                  <div class="form-group full indent-receive-field" style="display:none;">
+                    <label>Original Indent Ref. *</label>
+                    <select id="indent-return-ref" onchange="onIndentReceiveRefChange()"><option value="">— None —</option></select>
                   </div>
-                  <div class="form-group"><label>Requested Qty *</label><input type="number" id="indent-req-qty" placeholder="0" /></div>
-                  <div class="form-group"><label>Issued Qty</label><input type="number" id="indent-iss-qty" placeholder="0" /></div>
-                  <div class="form-group"><label>Issued To</label><input type="text" id="indent-issued-to" /></div>
-                  <div class="form-group">
+                  <div class="form-group"><label>Location *</label><select id="indent-location" onchange="onIndentLocationChange()"><option value="">Select…</option></select></div>
+
+                  <!-- ── SEARCHABLE ITEM COMBOBOX ── -->
+                  <div class="form-group full">
+                    <label>Item *</label>
+                    <div class="combobox-wrap" id="indent-item-combobox">
+                      <div class="combobox-input-wrap">
+                        <input
+                          type="text"
+                          class="combobox-input"
+                          id="indent-item-search"
+                          placeholder="Type to search items…"
+                          autocomplete="off"
+                          oninput="onComboboxSearch('indent')"
+                          onfocus="openComboboxDropdown('indent')"
+                        />
+                        <span class="combobox-chevron">▼</span>
+                      </div>
+                      <div class="combobox-dropdown" id="indent-item-dropdown"></div>
+                      <input type="hidden" id="indent-item" />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="availability-panel" id="indent-availability">
+                  <div class="avail-header">📊 Stock at selected location</div>
+                  <div class="avail-body">
+                    <div class="avail-stat"><div class="avail-stat-label">Received</div><div class="avail-stat-value" id="indent-avail-received">—</div></div>
+                    <div class="avail-stat"><div class="avail-stat-label">Issued</div><div class="avail-stat-value" id="indent-avail-issued">—</div></div>
+                    <div class="avail-stat"><div class="avail-stat-label">Available</div><div class="avail-stat-value" id="indent-avail-available">—</div></div>
+                  </div>
+                </div>
+
+                <div class="form-grid">
+                  <div class="form-group full"><label>Item Description</label><input type="text" id="indent-item-desc" class="readonly-field" readonly /></div>
+
+                  <!-- ── ISSUE-ONLY FIELDS ── -->
+                  <div class="form-group full indent-issue-field"><label>Requested By</label><input type="text" id="indent-requested-by" placeholder="Name of requester" readonly/></div>
+                  <div class="form-group indent-issue-field"><label>Requested Qty *</label><input type="number" id="indent-req-qty" placeholder="0" /></div>
+                  <div class="form-group indent-issue-field"><label>Issued Qty *</label><input type="number" id="indent-iss-qty" placeholder="0" /></div>
+                  <div class="form-group indent-issue-field"><label>Issued To *</label><input type="text" id="indent-issued-to" /></div>
+                  <div class="form-group indent-issue-field">
                     <label for="usedAtAs">Used At / As</label>
-                    <select name="usedAtAs" required>
+                    <select name="usedAtAs" id="indent-used-at">
                       <option value="" disabled selected hidden>-- Select an option --</option>
                       <option value="School">School</option>
                       <option value="Personal">Personal</option>
@@ -1125,14 +1316,29 @@
                       <option value="Lost">Lost</option>
                       <option value="Gift to Visitor">Gift to Visitor</option>
                     </select>
-                    <!-- <label>Used At / As</label> -->
-                    <!-- <input type="text" id="indent-used-at" />< -->
                   </div>
-                  <div class="form-group full"><label>Purpose of Use</label><input type="text" id="indent-purpose" /></div>
+                  <div class="form-group full indent-issue-field"><label>Purpose of Use</label><input type="text" id="indent-purpose" /></div>
+
+                  <!-- ── RECEIVE-ONLY FIELDS ── -->
+                  
+                  <div class="form-group indent-receive-field" style="display:none;"><label>Consumed Qty *</label><input type="number" id="indent-consumed-qty" placeholder="0" /></div>
+                  <div class="form-group indent-receive-field" style="display:none;"><label>Received Qty *</label><input type="number" id="indent-recv-qty" placeholder="0" /></div>
+                  <div class="form-group indent-receive-field" style="display:none;"><label>Received From</label><input type="text" id="indent-received-from" placeholder="Name returning the item" /></div>
+                  <div class="form-group indent-receive-field" style="display:none;">
+                    <label>Condition on Return</label>
+                    <select id="indent-return-condition">
+                      <option value="" disabled selected hidden>-- Select an option --</option>
+                      <option value="Good">Good</option>
+                      <option value="Damaged">Damaged</option>
+                      <option value="Not Usable">Not Usable</option>
+                    </select>
+                  </div>
+                  <div class="form-group full indent-receive-field" style="display:none;"><label>Reason for Return</label><input type="text" id="indent-return-reason" /></div>
+
                   <div class="form-group full"><label>Remarks</label><input type="text" id="indent-remarks" /></div>
                 </div>
                 <div class="form-actions">
-                  <button class="btn btn-primary" onclick="submitIndent()" id="btn-add-indent">＋ Submit Indent</button>
+                  <button class="btn btn-primary" onclick="submitIndent()" id="btn-add-indent">＋ Submit</button>
                 </div>
               </div>
               <div class="card">
@@ -1148,8 +1354,10 @@
                 </div>
                 <div class="table-wrap" style="max-height:600px; overflow-y:auto;">
                   <table id="indent-table">
-                    <thead><tr><th>Indent No.</th><th>Date</th><th>Location</th><th>Requested By</th><th>Item</th><th>Req. Qty</th><th>Issued Qty</th><th>Linked PL</th><th>Purpose</th></tr></thead>
-                    <tbody id="indent-tbody"><tr><td colspan="9"><div class="load-center"><div class="spinner"></div>Loading…</div></td></tr></tbody>
+                    <thead><tr><th>Indent No.</th><th>Type</th><th>Date</th><th>Location</th><th>Requested By</th><th>Item</th><th>Req. Qty</th><th>Issued/Recv Qty</th>
+                      <!-- <th>Linked PL</th> -->
+                      <th>Purpose</th></tr></thead>
+                    <tbody id="indent-tbody"><tr><td colspan="10"><div class="load-center"><div class="spinner"></div>Loading…</div></td></tr></tbody>
                   </table>
                 </div>
               </div>
@@ -1207,741 +1415,1334 @@
     const SUPABASE_ANON_KEY = "sb_publishable_BI2AZf0lFT4Mwd1nbFw9JA_Q85srW3C";
 
     const supabaseClient = window.supabase.createClient (
-      SUPABASE_URL,
-      SUPABASE_ANON_KEY
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY
     );
-// ─────────────────────────────────────────────────────────
-// STATE
-// ─────────────────────────────────────────────────────────
-let STATE = { items:[], catalogue:[], locations:[], prs:[], pls:[], indents:[], externalLink: null };
-let currentUser = null;
-let confirmCallback = null;
-let pendingApprovalPR = null;
-let pendingRejectPR   = null;
-let prFilter = 'All';
-let prSearch = '';
+    // ─────────────────────────────────────────────────────────
+    // STATE
+    // ─────────────────────────────────────────────────────────
+    let STATE = { items:[], catalogue:[], locations:[], prs:[], pls:[], indents:[], externalLink: null };
+    let confirmCallback = null;
+    let pendingApprovalPR = null;
+    let pendingRejectPR   = null;
+    let prFilter = 'All';
+    let prSearch = '';
+    let currentUser = null;
+    let currentItemsSubtab = 'items';
+    let indentTxnType = 'issue';
 
-// ─────────────────────────────────────────────────────────
-// SEARCHABLE COMBOBOX — PR Item
-// ─────────────────────────────────────────────────────────
-let prItemOptions = [];   // full list of item display strings
-let highlightedIndex = -1;
+    // ─────────────────────────────────────────────────────────
+    // ITEMS PAGE — ITEMS / CATEGORIES SUBTABS
+    // ─────────────────────────────────────────────────────────
+    function setItemsSubtab(tab) {
+      currentItemsSubtab = tab;
+      document.getElementById('items-subtab-items').classList.toggle('active', tab === 'items');
+      document.getElementById('items-subtab-categories').classList.toggle('active', tab === 'categories');
+      document.getElementById('items-table').style.display = tab === 'items' ? '' : 'none';
+      document.getElementById('cat-table').style.display = tab === 'categories' ? '' : 'none';
+      document.getElementById('items-list-title').textContent = tab === 'items' ? 'All Items' : 'All Categories';
+      const searchEl = document.getElementById('items-list-search');
+      searchEl.value = '';
+      searchEl.placeholder = tab === 'items' ? 'Search items…' : 'Search categories…';
+      // reset any prior filtering from the other table
+      filterTable(tab === 'items' ? 'items-table' : 'cat-table', '');
+    }
 
-function buildPRItemOptions() {
-  prItemOptions = STATE.items.map(i => i.display);
-}
+    // ─────────────────────────────────────────────────────────
+    // CATEGORY / SUBCATEGORY CREATABLE COMBOBOXES (Item Master page)
+    // ─────────────────────────────────────────────────────────
+    let catComboHighlight = { category: -1, subcategory: -1 };
 
-function openPRItemDropdown() {
-  const wrap = document.getElementById('pr-item-combobox');
-  wrap.classList.add('open');
-  renderPRItemDropdown(document.getElementById('pr-item-search').value);
-}
+    function openCatCombobox(kind) {
+      const wrap = document.getElementById('cat-' + kind + '-combobox');
+      if (kind === 'subcategory' && !v('item-category')) return; // must choose category first
+      wrap.classList.add('open');
+      renderCatComboDropdown(kind, document.getElementById('cat-' + kind + '-search').value);
+    }
 
-function closePRItemDropdown() {
-  document.getElementById('pr-item-combobox').classList.remove('open');
-  highlightedIndex = -1;
-}
+    function closeCatCombobox(kind) {
+      const wrap = document.getElementById('cat-' + kind + '-combobox');
+      if (wrap) wrap.classList.remove('open');
+      catComboHighlight[kind] = -1;
+    }
 
-function onPRItemSearch() {
-  const wrap = document.getElementById('pr-item-combobox');
-  wrap.classList.add('open');
-  // Clear the committed value when user edits text
-  document.getElementById('pr-item').value = '';
-  document.getElementById('pr-item-search').classList.remove('has-value');
-  document.getElementById('pr-item-desc').value = '';
-  document.getElementById('pr-availability').classList.remove('show');
-  highlightedIndex = -1;
-  renderPRItemDropdown(document.getElementById('pr-item-search').value);
-}
-
-function renderPRItemDropdown(query) {
-  const dropdown = document.getElementById('pr-item-dropdown');
-  const q = query.trim().toLowerCase();
-  const filtered = q
-    ? prItemOptions.filter(opt => opt.toLowerCase().includes(q))
-    : prItemOptions;
-
-  if (!filtered.length) {
-    dropdown.innerHTML = '<div class="combobox-empty">No items match</div>';
-    return;
-  }
-
-  dropdown.innerHTML = filtered.map((opt, idx) => {
-    const label = q ? opt.replace(new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi'), '<mark>$1</mark>') : opt;
-    return `<div class="combobox-option" data-value="${esc(opt)}" data-idx="${idx}"
-              onmousedown="selectPRItem('${esc(opt)}')">${label}</div>`;
-  }).join('');
-}
-
-function selectPRItem(value) {
-  document.getElementById('pr-item').value = value;
-  document.getElementById('pr-item-search').value = value;
-  document.getElementById('pr-item-search').classList.add('has-value');
-  closePRItemDropdown();
-  // Trigger the downstream logic (description + availability)
-  onPRItemChange();
-}
-
-function clearPRItemCombobox() {
-  document.getElementById('pr-item').value = '';
-  document.getElementById('pr-item-search').value = '';
-  document.getElementById('pr-item-search').classList.remove('has-value');
-  document.getElementById('pr-item-desc').value = '';
-  document.getElementById('pr-availability').classList.remove('show');
-  closePRItemDropdown();
-}
-
-// Keyboard navigation for the combobox
-document.addEventListener('DOMContentLoaded', function() {
-  const searchInput = document.getElementById('pr-item-search');
-  if (searchInput) {
-    searchInput.addEventListener('keydown', function(e) {
-      const dropdown = document.getElementById('pr-item-dropdown');
-      const options  = dropdown.querySelectorAll('.combobox-option');
-      if (!options.length) return;
-
-      if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        highlightedIndex = Math.min(highlightedIndex + 1, options.length - 1);
-        updateHighlight(options);
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        highlightedIndex = Math.max(highlightedIndex - 1, 0);
-        updateHighlight(options);
-      } else if (e.key === 'Enter') {
-        e.preventDefault();
-        if (highlightedIndex >= 0 && options[highlightedIndex]) {
-          selectPRItem(options[highlightedIndex].dataset.value);
-        }
-      } else if (e.key === 'Escape') {
-        // Restore last committed value on escape
-        const committed = document.getElementById('pr-item').value;
-        document.getElementById('pr-item-search').value = committed;
-        closePRItemDropdown();
+    function onCatComboSearch(kind) {
+      const wrap = document.getElementById('cat-' + kind + '-combobox');
+      wrap.classList.add('open');
+      document.getElementById('item-' + kind).value = '';
+      document.getElementById('cat-' + kind + '-search').classList.remove('has-value');
+      if (kind === 'category') {
+        // changing category invalidates the chosen subcategory
+        document.getElementById('item-subcategory').value = '';
+        document.getElementById('cat-subcategory-search').value = '';
+        document.getElementById('cat-subcategory-search').classList.remove('has-value');
       }
+      catComboHighlight[kind] = -1;
+      renderCatComboDropdown(kind, document.getElementById('cat-' + kind + '-search').value);
+    }
+
+    function catComboOptionsFor(kind) {
+      if (kind === 'category') {
+        return [...new Set(STATE.catalogue.map(c => c.category))];
+      }
+      const cat = v('item-category');
+      return [...new Set(STATE.catalogue.filter(c => c.category === cat).map(c => c.subcategory))];
+    }
+
+    function renderCatComboDropdown(kind, query) {
+      const dropdown = document.getElementById('cat-' + kind + '-dropdown');
+      if (kind === 'subcategory' && !v('item-category')) {
+        dropdown.innerHTML = '<div class="combobox-empty">Select a category first</div>';
+        return;
+      }
+      const q = (query || '').trim();
+      const ql = q.toLowerCase();
+      const options = catComboOptionsFor(kind);
+      const filtered = ql ? options.filter(o => o.toLowerCase().includes(ql)) : options;
+
+      let html = filtered.map(opt => {
+        const label = ql ? opt.replace(new RegExp(`(${ql.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi'), '<mark>$1</mark>') : opt;
+        return `<div class="combobox-option" data-value="${esc(opt)}" onmousedown="selectCatComboOption('${kind}','${esc(opt)}')">${label}</div>`;
+      }).join('');
+
+      // "Create new" option — only when the typed text doesn't already match an existing option exactly
+      const exists = options.some(o => o.toLowerCase() === ql);
+      if (q && !exists) {
+        const label = kind === 'category' ? 'category' : 'subcategory';
+        html += `<div class="combobox-option combobox-create" onmousedown="selectCatComboOption('${kind}','${esc(q)}', true)">➕ Create new ${label} “${esc(q)}”</div>`;
+      }
+
+      if (!html) {
+        html = `<div class="combobox-empty">No ${kind === 'category' ? 'categories' : 'subcategories'} yet — type to create one</div>`;
+      }
+      dropdown.innerHTML = html;
+    }
+
+    function selectCatComboOption(kind, value, isNew) {
+      document.getElementById('item-' + kind).value = value;
+      document.getElementById('cat-' + kind + '-search').value = value;
+      document.getElementById('cat-' + kind + '-search').classList.add('has-value');
+      closeCatCombobox(kind);
+      if (kind === 'category') {
+        // reset subcategory whenever category changes
+        document.getElementById('item-subcategory').value = '';
+        document.getElementById('cat-subcategory-search').value = '';
+        document.getElementById('cat-subcategory-search').classList.remove('has-value');
+        document.getElementById('cat-subcategory-search').placeholder = 'Type to search or add subcategory…';
+        updateItemCodePreview();
+      } else {
+        updateItemCodePreview();
+      }
+      if (isNew) {
+        showToast(`“${value}” will be created as a new ${kind} when you save the item`, 'success');
+      }
+    }
+
+    document.addEventListener('click', function(e) {
+      ['category', 'subcategory'].forEach(kind => {
+        const wrap = document.getElementById('cat-' + kind + '-combobox');
+        if (wrap && !wrap.contains(e.target)) {
+          const committed = document.getElementById('item-' + kind).value;
+          const searchEl = document.getElementById('cat-' + kind + '-search');
+          if (committed) { searchEl.value = committed; searchEl.classList.add('has-value'); }
+          closeCatCombobox(kind);
+        }
+      });
     });
-  }
-});
 
-function updateHighlight(options) {
-  options.forEach((o, i) => o.classList.toggle('highlighted', i === highlightedIndex));
-  if (options[highlightedIndex]) options[highlightedIndex].scrollIntoView({ block: 'nearest' });
-}
+    // ─────────────────────────────────────────────────────────
+    // SEARCHABLE COMBOBOX — shared across PR / PL / Indent item fields
+    // ─────────────────────────────────────────────────────────
+    let itemComboOptions = [];     // full list of "code - name" display strings, shared by all comboboxes
+    let comboHighlightIndex = {};  // per-prefix highlighted dropdown index
 
-// Close dropdown when clicking outside
-document.addEventListener('click', function(e) {
-  const wrap = document.getElementById('pr-item-combobox');
-  if (wrap && !wrap.contains(e.target)) {
-    // If no item committed, revert text to committed value
-    const committed = document.getElementById('pr-item').value;
-    document.getElementById('pr-item-search').value = committed;
-    if (!committed) document.getElementById('pr-item-search').classList.remove('has-value');
-    closePRItemDropdown();
-  }
-});
+    function buildItemComboOptions() {
+      itemComboOptions = STATE.items.map(i => i.item_code + ' - ' + i.item_name);
+    }
 
-// ─────────────────────────────────────────────────────────
-// AUTH
-// ─────────────────────────────────────────────────────────
-async function getUserFromEmail(email) {
-  const { data, error } = await supabaseClient.rpc('get_user_from_email', { p_email: email });
-  console.log(data);
-  return data;
-}
+    function comboCode(val) {
+      return val ? val.split(' - ')[0] : '';
+    }
 
-async function checkUser() {
-  const { data: { user } } = await supabaseClient.auth.getUser();
-  if (user) {
-    console.log(user);
-    const userData = await getUserFromEmail(user.email);
-    console.log(userData);
-    activateApp(userData);
-    // currentUser =
-    // output.textContent = "Logged in user:\n" + JSON.stringify(user, null, 2);
-  } else {
-    // output.textContent = "Not logged in";
-      supabaseClient.auth.signInWithOAuth({
-      provider: "google"
+    function openComboboxDropdown(prefix) {
+      const wrap = document.getElementById(prefix + '-item-combobox');
+      wrap.classList.add('open');
+      renderComboboxDropdown(prefix, document.getElementById(prefix + '-item-search').value);
+    }
+
+    function closeComboboxDropdown(prefix) {
+      const wrap = document.getElementById(prefix + '-item-combobox');
+      if (wrap) wrap.classList.remove('open');
+      comboHighlightIndex[prefix] = -1;
+    }
+
+    function onComboboxSearch(prefix) {
+      const wrap = document.getElementById(prefix + '-item-combobox');
+      wrap.classList.add('open');
+      // Clear the committed value when user edits text
+      document.getElementById(prefix + '-item').value = '';
+      document.getElementById(prefix + '-item-search').classList.remove('has-value');
+      onComboboxCleared(prefix);
+      comboHighlightIndex[prefix] = -1;
+      renderComboboxDropdown(prefix, document.getElementById(prefix + '-item-search').value);
+    }
+
+    function onComboboxCleared(prefix) {
+      if (prefix === 'pr') {
+        document.getElementById('pr-item-desc').value = '';
+        document.getElementById('pr-availability').classList.remove('show');
+      } else if (prefix === 'pl') {
+        document.getElementById('pl-item-desc').value = '';
+      } else if (prefix === 'indent') {
+        document.getElementById('indent-item-desc').value = '';
+        document.getElementById('indent-availability').classList.remove('show');
+      }
+    }
+
+    function renderComboboxDropdown(prefix, query) {
+      const dropdown = document.getElementById(prefix + '-item-dropdown');
+      const q = query.trim().toLowerCase();
+      const filtered = q
+        ? itemComboOptions.filter(opt => opt.toLowerCase().includes(q))
+        : itemComboOptions;
+
+      if (!filtered.length) {
+        dropdown.innerHTML = '<div class="combobox-empty">No items match</div>';
+        return;
+      }
+
+      dropdown.innerHTML = filtered.map((opt, idx) => {
+        const label = q ? opt.replace(new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi'), '<mark>$1</mark>') : opt;
+        return `<div class="combobox-option" data-value="${esc(opt)}" data-idx="${idx}"
+                  onmousedown="selectComboboxItem('${prefix}','${esc(opt)}')">${label}</div>`;
+      }).join('');
+    }
+
+    function selectComboboxItem(prefix, value) {
+      document.getElementById(prefix + '-item').value = value;
+      document.getElementById(prefix + '-item-search').value = value;
+      document.getElementById(prefix + '-item-search').classList.add('has-value');
+      closeComboboxDropdown(prefix);
+      // Trigger the downstream logic (description + availability) for the relevant page
+      if (prefix === 'pr') onPRItemChange();
+      else if (prefix === 'pl') onPLItemChange();
+      else if (prefix === 'indent') onIndentItemChange();
+    }
+
+    function clearComboboxItem(prefix) {
+      document.getElementById(prefix + '-item').value = '';
+      document.getElementById(prefix + '-item-search').value = '';
+      document.getElementById(prefix + '-item-search').classList.remove('has-value');
+      onComboboxCleared(prefix);
+      closeComboboxDropdown(prefix);
+    }
+
+    // Keyboard navigation for each combobox
+    document.addEventListener('DOMContentLoaded', function() {
+      ['pr', 'pl', 'indent'].forEach(prefix => {
+        const searchInput = document.getElementById(prefix + '-item-search');
+        if (!searchInput) return;
+        searchInput.addEventListener('keydown', function(e) {
+          const dropdown = document.getElementById(prefix + '-item-dropdown');
+          const options  = dropdown.querySelectorAll('.combobox-option');
+          if (!options.length) return;
+
+          let hi = (comboHighlightIndex[prefix] !== undefined) ? comboHighlightIndex[prefix] : -1;
+
+          if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            hi = Math.min(hi + 1, options.length - 1);
+            comboHighlightIndex[prefix] = hi;
+            updateComboHighlight(options, hi);
+          } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            hi = Math.max(hi - 1, 0);
+            comboHighlightIndex[prefix] = hi;
+            updateComboHighlight(options, hi);
+          } else if (e.key === 'Enter') {
+            e.preventDefault();
+            if (hi >= 0 && options[hi]) {
+              selectComboboxItem(prefix, options[hi].dataset.value);
+            }
+          } else if (e.key === 'Escape') {
+            // Restore last committed value on escape
+            const committed = document.getElementById(prefix + '-item').value;
+            document.getElementById(prefix + '-item-search').value = committed;
+            closeComboboxDropdown(prefix);
+          }
+        });
+      });
+
+      // Keyboard nav for category/subcategory creatable comboboxes
+      ['category', 'subcategory'].forEach(kind => {
+        const searchInput = document.getElementById('cat-' + kind + '-search');
+        if (!searchInput) return;
+        searchInput.addEventListener('keydown', function(e) {
+          const dropdown = document.getElementById('cat-' + kind + '-dropdown');
+          const options  = dropdown.querySelectorAll('.combobox-option');
+          if (!options.length) return;
+          let hi = catComboHighlight[kind] !== undefined ? catComboHighlight[kind] : -1;
+          if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            hi = Math.min(hi + 1, options.length - 1);
+            catComboHighlight[kind] = hi;
+            updateComboHighlight(options, hi);
+          } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            hi = Math.max(hi - 1, 0);
+            catComboHighlight[kind] = hi;
+            updateComboHighlight(options, hi);
+          } else if (e.key === 'Enter') {
+            e.preventDefault();
+            if (hi >= 0 && options[hi]) {
+              options[hi].dispatchEvent(new Event('mousedown'));
+            }
+          } else if (e.key === 'Escape') {
+            const committed = document.getElementById('item-' + kind).value;
+            document.getElementById('cat-' + kind + '-search').value = committed;
+            closeCatCombobox(kind);
+          }
+        });
+      });
     });
-  }
-}
 
-window.onload = function () {
+    function updateComboHighlight(options, hi) {
+      options.forEach((o, i) => o.classList.toggle('highlighted', i === hi));
+      if (options[hi]) options[hi].scrollIntoView({ block: 'nearest' });
+    }
 
-  checkUser();
-  
-  // google.script.run
-  //   .withSuccessHandler(function (user) {
-  //     if (!user) { showDenied('', 'No users have been added to the system yet.'); return; }
-  //     if (user.unauthorised) { showDenied(user.email, 'Your Google account is not authorised.'); return; }
-  //     currentUser = user;
-  //     activateApp();
-  //   })
-  //   .withFailureHandler(function (err) {
-  //     showDenied('', 'Could not verify your account. Try reloading. (' + err.message + ')');
-  //   })
-  //   .getCurrentUser();
-};
+    // Close dropdown when clicking outside any of the comboboxes
+    document.addEventListener('click', function(e) {
+      ['pr', 'pl', 'indent'].forEach(prefix => {
+        const wrap = document.getElementById(prefix + '-item-combobox');
+        if (wrap && !wrap.contains(e.target)) {
+          // If no item committed, revert text to committed value
+          const committed = document.getElementById(prefix + '-item').value;
+          const searchEl = document.getElementById(prefix + '-item-search');
+          searchEl.value = committed;
+          if (!committed) searchEl.classList.remove('has-value');
+          closeComboboxDropdown(prefix);
+        }
+      });
+    });
 
-function showDenied(email, msg) {
-  document.getElementById('loading-card-inner').innerHTML =
-    '<div class="loading-logo"><img src="https://shaishavchildrights.org/wp-content/uploads/2025/07/Shaishav-Trust-Bhavnagar-Logo-Final.jpg" alt="Shaishav Logo"> Shaishav</div>' +
-    '<div class="denied-icon">🔒</div>' +
-    '<div class="denied-title">Access Denied</div>' +
-    '<div class="denied-sub">' + msg + (email ? '<br><span class="denied-email">' + email + '</span>' : '') + '</div>';
-}
+    // ─────────────────────────────────────────────────────────
+    // Supbase Calls
+    // ─────────────────────────────────────────────────────────
+    async function getItems() {
+      const { data, error } = await supabaseClient
+        .from('items_v')
+        .select();
+      if (data) {
+        return data;
+      }
+      showToast('Error while fetching items: ' + error.message, 'error');
+    }
 
-function activateApp(currentUser) {
-  document.getElementById('user-name-display').textContent = currentUser.username;
-  document.getElementById('user-avatar').textContent = currentUser.username.charAt(0).toUpperCase();
-  document.getElementById('greet-name').textContent = currentUser.username;
-  if (currentUser.role === 'admin') document.getElementById('admin-pill').style.display = '';
-  document.getElementById('sidebar').classList.remove('hidden');
-  document.getElementById('screen-loading').classList.remove('active');
-  document.getElementById('screen-loading').classList.add('hidden');
-  document.getElementById('screen-loading').parentNode.hidden = true;
-  document.getElementById("screen-loading").style.display = "none";
-  document.getElementById('screen-app').classList.add('active');
-  setDefaultDates();
-  google.script.run
-    .withSuccessHandler(data => { STATE = data; populateDropdowns(); renderAll(); })
-    .withFailureHandler(() => showToast('Failed to load data', 'error'))
-    .getInitData();
-}
+    async function getItemCategories() {
+      const { data, error } = await supabaseClient
+        .from('item_categories_v')
+        .select();
+      if (data) {
+        return data;
+      }
+      showToast('Error while fetching Item Categories: ' + error.message, 'error');
+    }
 
-// ─────────────────────────────────────────────────────────
-// NAVIGATION
-// ─────────────────────────────────────────────────────────
-function showPage(name) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-  document.getElementById('page-' + name).classList.add('active');
-  document.getElementById('nav-' + name).classList.add('active');
-}
-function goHome() { showPage('home'); }
+    async function getLocations() {
+      const { data, error } = await supabaseClient
+        .from('locations_v')
+        .select();
+      if (data) {
+        return data;
+      }
+      showToast('Error while fetching Locations: ' + error.message, 'error');
+    }
 
-function goToReportsPage() {
-  google.script.run
-    .withSuccessHandler(openReportsPage)
-    .withFailureHandler(() => showToast('Failed to goto reports page', 'error'))
-    .getLink('Reports');
-}
+    async function getPurchaseRequisitions() {
+      const { data, error } = await supabaseClient
+        .from('purchase_requisitions_v')
+        .select();
+      if (data) {
+        return data;
+      }
+      showToast('Error while fetching Purchase Requisitions: ' + error.message, 'error');
+    }
 
-function openReportsPage(url) {
-  console.log("reports url: " + url);
-  window.open(url, "_top");
-}
+    async function getPurchaseLedgers() {
+      const { data, error } = await supabaseClient
+        .from('purchase_ledgers_v')
+        .select();
+      if (data) {
+        return data;
+      }
+      showToast('Error while fetching Purchase Ledgers: ' + error.message, 'error');
+    }
 
-function setDefaultDates() {
-  const today = new Date().toISOString().split('T')[0];
-  ['pr-date','pr-date-req','pl-date','pl-billing-date','indent-date'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = today;
-  });
-}
+    async function getIndents() {
+      const { data, error } = await supabaseClient
+        .from('indents_v')
+        .select();
+      if (data) {
+        return data;
+      }
+      showToast('Error while fetching Indents: ' + error.message, 'error');
+    }
 
-// ─────────────────────────────────────────────────────────
-// DROPDOWNS
-// ─────────────────────────────────────────────────────────
-function populateDropdowns() {
-  const cats = [...new Set(STATE.catalogue.map(c => c.category))];
-  const catSel = document.getElementById('item-category');
-  catSel.innerHTML = '<option value="">Select category…</option>';
-  cats.forEach(c => catSel.innerHTML += `<option value="${c}">${c}</option>`);
+    async function getInitData() {
+      STATE.items = await getItems();
+      STATE.catalogue = await getItemCategories();
+      STATE.prs = await getPurchaseRequisitions();
+      STATE.locations = await getLocations();
+      STATE.pls = await getPurchaseLedgers();
+      STATE.indents = await getIndents();
+      console.log(STATE);
+    }
 
-  ['pr-location','pl-location','indent-location'].forEach(id => {
-    const sel = document.getElementById(id);
-    sel.innerHTML = '<option value="">Select…</option>';
-    STATE.locations.forEach(l => sel.innerHTML += `<option value="${l}">${l}</option>`);
-  });
+    // ─────────────────────────────────────────────────────────
+    // AUTH
+    // ─────────────────────────────────────────────────────────
+    async function handleLogout() {
+      const { error } = await supabaseClient.auth.signOut()
+      if (error) {
+        console.error('Error logging out:', error.message)
+      } else {
+        window.location.reload();
+      }
+    }
 
-  // PR item: populate combobox (not a <select>)
-  buildPRItemOptions();
+    async function getUserFromEmail(email) {
+      const { data, error } = await supabaseClient.rpc('get_user_from_email', { p_email: email });
+      // console.log(data);
+      return data;
+    }
 
-  // PL and Indent still use regular selects
-  ['pl-item','indent-item'].forEach(id => {
-    const sel = document.getElementById(id);
-    sel.innerHTML = '<option value="">Select item…</option>';
-    STATE.items.forEach(i => sel.innerHTML += `<option value="${i.display}">${i.display}</option>`);
-  });
+    async function checkUser() {
+      // console.log('in checkUser')
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      if (user) {
+        console.log(user);
+        const userData = await getUserFromEmail(user.email);
+        console.log(userData);
+        // console.log(userData);
+        currentUser = userData;
+        if (currentUser.user_id) {
+          activateApp();;
+        } else {
+          showDenied(user.email, 'If you believe this is an error: Please verify your credentials or contact system administrator.');
+        }
+        
+      } else {
+        // output.textContent = "Not logged in";
+          supabaseClient.auth.signInWithOAuth({
+          provider: "google"
+          // ,options: {
+          //   redirectTo: 'http://127.0.0.1:5500/shaishav', // Must be an absolute URL
+          // }
+        });
+      }
+    }
 
-  const approvedPRs = STATE.prs.filter(p => p.status === 'Approved');
-  const plPRSel = document.getElementById('pl-linked-pr');
-  plPRSel.innerHTML = '<option value="">— None —</option>';
-  approvedPRs.forEach(p => plPRSel.innerHTML += `<option value="${p.prNumber}">${p.prNumber} — ${p.item} @ ${p.location}</option>`);
+    window.onload = function () {
+      checkUser();
+    };
 
-  const indPLSel = document.getElementById('indent-linked-pl');
-  indPLSel.innerHTML = '<option value="">— None —</option>';
-  STATE.pls.forEach(p => indPLSel.innerHTML += `<option value="${p.plNumber}">${p.plNumber} — ${p.item}</option>`);
-}
+    function showDenied(email, msg) {
+      document.getElementById('loading-card-inner').innerHTML =
+        '<div class="loading-logo"><img src="https://shaishavchildrights.org/wp-content/uploads/2025/07/Shaishav-Trust-Bhavnagar-Logo-Final.jpg" alt="Shaishav Logo"> Shaishav</div>' +
+        '<div class="denied-icon">🔒</div>' +
+        '<div class="denied-title">Access Denied</div>' +
+        '<div class="denied-sub">' + msg + (email ? '<br><span class="denied-email">' + email + '</span>' : '') + '</div>' +
+        '<br><button class="btn" style="background:var(--bg); color:var(--ink2);" onclick="handleLogout()">Logout</button>';
+    }
 
-function onCategoryChange() {
-  const cat = document.getElementById('item-category').value;
-  const subs = STATE.catalogue.filter(c => c.category === cat).map(c => c.subcategory);
-  const sel = document.getElementById('item-subcategory');
-  sel.innerHTML = '<option value="">Select subcategory…</option>';
-  subs.forEach(s => sel.innerHTML += `<option value="${s}">${s}</option>`);
-  updateItemCodePreview();
-}
+    async function activateApp() {
+      document.getElementById('user-name-display').textContent = currentUser.username;
+      document.getElementById('user-avatar').textContent = currentUser.username.charAt(0).toUpperCase();
+      document.getElementById('greet-name').textContent = currentUser.username;
+      if (currentUser.role === 'A') document.getElementById('admin-pill').style.display = '';
+      document.getElementById('sidebar').classList.remove('hidden');
+      document.getElementById('screen-loading').classList.remove('active');
+      document.getElementById('screen-loading').classList.add('hidden');
+      document.getElementById('screen-loading').parentNode.hidden = true;
+      document.getElementById("screen-loading").style.display = "none";
+      document.getElementById('screen-app').classList.add('active');
+      setDefaultDates();
+      await getInitData();
+      renderAll();
+      populateDropdowns();
+      setIndentTxnType('issue');
+      // STATE = 
+      // google.script.run
+      //   .withSuccessHandler(data => { STATE = data; populateDropdowns(); renderAll(); })
+      //   .withFailureHandler(() => showToast('Failed to load data', 'error'))
+      //   .getInitData();
+    }
 
-function updateItemCodePreview() {
-  const cat = document.getElementById('item-category').value;
-  const sub = document.getElementById('item-subcategory').value;
-  const match = STATE.catalogue.find(c => c.category === cat && c.subcategory === sub);
-  const prefix = match ? match.code : '??';
-  const existing = STATE.items.filter(i => i.code.startsWith(prefix + '_'));
-  const nums = existing.map(i => parseInt(i.code.split('_').pop()) || 0);
-  const next = nums.length ? Math.max(...nums) + 1 : 1;
-  document.getElementById('item-code-preview').textContent = prefix + '_' + String(next).padStart(4,'0');
-}
+    // ─────────────────────────────────────────────────────────
+    // NAVIGATION
+    // ─────────────────────────────────────────────────────────
+    function showPage(name) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+      document.getElementById('page-' + name).classList.add('active');
+      document.getElementById('nav-' + name).classList.add('active');
+    }
+    function goHome() { showPage('home'); }
 
-function updateCatCodePreview() {
-  const cat = document.getElementById('cat-category').value.trim();
-  const sub = document.getElementById('cat-subcategory').value.trim();
-  if (!cat || !sub) { document.getElementById('cat-code-preview').textContent = 'Auto Code'; return; }
-  const ci = cat.split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0,2);
-  const si = sub.split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0,1);
-  document.getElementById('cat-code-preview').textContent = ci + '_' + si;
-}
+    function goToReportsPage() {
+      window.location.href = "reports.html";
+      // google.script.run
+      //   .withSuccessHandler(openReportsPage)
+      //   .withFailureHandler(() => showToast('Failed to goto reports page', 'error'))
+      //   .getLink('Reports');
+    }
 
-// ─────────────────────────────────────────────────────────
-// PR ITEM / LOCATION CHANGE → Availability
-// ─────────────────────────────────────────────────────────
-function onPRLocationChange() { updatePRAvailability(); }
+    function openReportsPage(url) {
+      console.log("reports url: " + url);
+      window.open(url, "_top");
+    }
 
-function onPRItemChange() {
-  // reads from the hidden input #pr-item (set by selectPRItem)
-  const item = STATE.items.find(i => i.display === document.getElementById('pr-item').value);
-  document.getElementById('pr-item-desc').value = item ? item.description : '';
-  updatePRAvailability();
-}
+    function setDefaultDates() {
+      const today = new Date().toISOString().split('T')[0];
+      ['pr-date','pr-date-req','pl-date','pl-billing-date','indent-date'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = today;
+      });
+    }
 
-function updatePRAvailability() {
-  const itemDisplay = document.getElementById('pr-item').value;
-  const location    = document.getElementById('pr-location').value;
-  const panel       = document.getElementById('pr-availability');
+    // ─────────────────────────────────────────────────────────
+    // DROPDOWNS
+    // ─────────────────────────────────────────────────────────
+    async function populateDropdowns() {
+      // Category/subcategory are now creatable comboboxes — see onCategoryChange/catComboOptionsFor.
 
-  if (!itemDisplay || !location) { panel.classList.remove('show'); return; }
+      ['pr-location','pl-location','indent-location'].forEach(id => {
+        const sel = document.getElementById(id);
+        sel.innerHTML = '<option value="" disabled selected hidden>Select…</option>';
+        STATE.locations.forEach(l => sel.innerHTML += `<option value="${l.location_id}">${l.location_name}</option>`);
+      });
 
-  const pls = STATE.pls.filter(p => p.item === itemDisplay && p.location === location);
-  const received = pls.reduce((s, p) => s + (parseFloat(p.qty) || 0), 0);
+      // Item comboboxes (PR / PL / Indent) share the same option list
+      buildItemComboOptions();
 
-  const indents = STATE.indents.filter(i => i.item === itemDisplay && i.location === location);
-  const issued = indents.reduce((s, i) => s + (parseFloat(i.issuedQty) || 0), 0);
+      const approvedPRs = STATE.prs.filter(p => p.status === 'Approved');
+      const plPRSel = document.getElementById('pl-linked-pr');
+      plPRSel.innerHTML = '<option value="">— None —</option>';
+      approvedPRs.forEach(p => plPRSel.innerHTML += `<option value="${p.pr_number}">${p.pr_number} — ${p.item_name} @ ${p.location_name}</option>`);
 
-  const available = received - issued;
+      // Populate "original indent" reference dropdown for Indent → Received flow
+      const retRefSel = document.getElementById('indent-return-ref');
+      if (retRefSel) {
+        retRefSel.innerHTML = '<option value="" disabled selected hidden>— None —</option>';
+        const { data, error } = await supabaseClient
+          .from('indent_balance_v')
+          .select('*')
+          .gt('remaining', '0');
+        // const issuedIndents = (STATE.indents || []).filter(i => (i.type || 'Issued') === 'Issued');
+        data.forEach(i => retRefSel.innerHTML += `<option value="${i.indent_display}">${i.indent_display}</option>`);
+      }
+    }
 
-  document.getElementById('avail-received').textContent = received;
-  document.getElementById('avail-issued').textContent   = issued;
+    function onCategoryChange() {
+      // kept for compatibility — subcategory list is rebuilt on demand by catComboOptionsFor()
+      updateItemCodePreview();
+    }
 
-  const avEl = document.getElementById('avail-available');
-  avEl.textContent = available;
-  avEl.className = 'avail-stat-value ' + (available > 5 ? 'avail-ok' : available > 0 ? 'avail-warn' : 'avail-zero');
+    function updateItemCodePreview() {
+      const cat = document.getElementById('item-category').value;
+      const sub = document.getElementById('item-subcategory').value;
+      const match = STATE.catalogue.find(c => c.category === cat && c.subcategory === sub);
+      const prefix = match ? match.code : '??';
+      const existing = STATE.items.filter(i => i.item_code.startsWith(prefix + '_'));
+      const nums = existing.map(i => parseInt(i.item_code.split('_').pop()) || 0);
+      const next = nums.length ? Math.max(...nums) + 1 : 1;
+      document.getElementById('item-code-preview').textContent = prefix + '_' + String(next).padStart(4,'0');
+    }
 
-  panel.classList.add('show');
-}
+    function updateCatCodePreview() {
+      // retained for backward compatibility; the merged Item Master page derives
+      // codes automatically from the selected/typed category+subcategory instead.
+    }
 
-function onPLItemChange() {
-  const item = STATE.items.find(i => i.display === document.getElementById('pl-item').value);
-  document.getElementById('pl-item-desc').value = item ? item.description : '';
-}
-function onIndentItemChange() {
-  const item = STATE.items.find(i => i.display === document.getElementById('indent-item').value);
-  document.getElementById('indent-item-desc').value = item ? item.description : '';
-}
+    // ─────────────────────────────────────────────────────────
+    // PR ITEM / LOCATION CHANGE → Availability
+    // ─────────────────────────────────────────────────────────
+    function onPRLocationChange() { updatePRAvailability(); }
 
-function calcBudget() {
-  const q = parseFloat(document.getElementById('pr-qty').value)||0;
-  const p = parseFloat(document.getElementById('pr-price').value)||0;
-  document.getElementById('pr-budget').value = (q*p).toLocaleString('en-IN',{minimumFractionDigits:2});
-}
-function calcTotal() {
-  const q = parseFloat(document.getElementById('pl-qty').value)||0;
-  const p = parseFloat(document.getElementById('pl-price').value)||0;
-  document.getElementById('pl-total').value = (q*p).toLocaleString('en-IN',{minimumFractionDigits:2});
-}
+    function onPLPRReferenceChange() {
+      const linkedPrNumber =  v('pl-linked-pr');
+      if (linkedPrNumber.trim() === '') {
+        return;
+      }
+      const prs = STATE.prs;
+      const locations = STATE.locations;
+      const items = STATE.items;
+      const linkedPr = prs.find(prs => prs.pr_number === linkedPrNumber);
+      const location = locations.find(locations => locations.location_name === linkedPr.location_name);
 
-// ─────────────────────────────────────────────────────────
-// SUBMIT HANDLERS
-// ─────────────────────────────────────────────────────────
-function submitCatalogue() {
-  const category = v('cat-category'), subcategory = v('cat-subcategory');
-  if (!category || !subcategory) return showToast('Both fields are required', 'error');
-  const btn = document.getElementById('btn-add-cat');
-  setLoading(btn, true);
-  google.script.run
-    .withSuccessHandler(res => {
-      setLoading(btn, false);
-      if (!res.success) return showToast(res.error, 'error');
-      showToast('Added: ' + res.code, 'success');
-      document.getElementById('cat-category').value = '';
-      document.getElementById('cat-subcategory').value = '';
-      document.getElementById('cat-code-preview').textContent = 'Auto Code';
+      document.getElementById('pl-location').value = location.location_id;
+
+      const item = items.find(i => i.item_code === linkedPr.item_code);
+      const comboVal = item ? (item.item_code + ' - ' + item.item_name) : (linkedPr.item_code || '');
+      document.getElementById('pl-item').value = comboVal;
+      document.getElementById('pl-item-search').value = comboVal;
+      if (comboVal) document.getElementById('pl-item-search').classList.add('has-value');
+
+      document.getElementById('pl-qty').value = linkedPr.pr_qty;
+      document.getElementById('pl-price').value = linkedPr.budget / linkedPr.pr_qty;
+      calcTotal();
+      onPLItemChange();
+    }
+
+    function onPRItemChange() {
+      // reads from the hidden input #pr-item (set by selectComboboxItem)
+      const item = STATE.items.find(i => i.item_code + ' - ' + i.item_name === document.getElementById('pr-item').value);
+      document.getElementById('pr-item-desc').value = item ? item.item_description : '';
+      updatePRAvailability();
+    }
+
+    async function updatePRAvailability() {
+      const itemDisplay = document.getElementById('pr-item').value;
+      const location    = document.getElementById('pr-location').value;
+      const panel       = document.getElementById('pr-availability');
+
+      if (!itemDisplay || !location) { panel.classList.remove('show'); return; }
+      // const pls = STATE.pls.filter(p => p.item === itemDisplay && p.location_id == location);
+      // const received = pls.reduce((s, p) => s + (parseFloat(p.quantity) || 0), 0);
+
+      // const indents = STATE.indents.filter(i => i.item === itemDisplay && i.location_id == location);
+      // const issued = indents.reduce((s, i) => s + (parseFloat(i.issuedQty) || 0), 0);
+
+      const { data, error } = await supabaseClient
+      .from('available_items_v') // Pass your view name here
+      .select('purchased, consumed, received, issued')          // Specify columns to fetch
+      .eq('item_code', itemDisplay.split(' ')[0]) 
+      .eq('location_id', location);
+
+      // console.log(data);
+
+      const validItemCount = data[0].purchased - data[0].consumed;
+      const issued = data[0].issued - data[0].received;
+
+      const available = validItemCount - issued;
+
+      document.getElementById('pr-avail-received').textContent = validItemCount;
+      document.getElementById('pr-avail-issued').textContent   = issued;
+
+      const avEl = document.getElementById('pr-avail-available');
+      avEl.textContent = available;
+      avEl.className = 'avail-stat-value ' + (available > 5 ? 'avail-ok' : available > 0 ? 'avail-warn' : 'avail-zero');
+
+      panel.classList.add('show');
+    }
+
+    function onPLItemChange() {
+      const code = comboCode(document.getElementById('pl-item').value);
+      const item = STATE.items.find(i => i.item_code === code);
+      document.getElementById('pl-item-desc').value = item ? item.item_description : '';
+    }
+
+    function onIndentReceiveRefChange() {
+      const indentReturnRef = v('indent-return-ref');
+      const indent = STATE.indents.find(i => i.indent_number === indentReturnRef);
+      // console.log(indent);
+      const locationId = STATE.locations.find(l => l.location_name == indent.location_name).location_id;
+      // console.log(locationId);
+      document.getElementById('indent-location').value = locationId;
+      document.getElementById('indent-item').value = indent.item;
+      document.getElementById('indent-item-desc').value = indent.item_description;
+      document.getElementById('indent-received-from').value = indent.issued_to
+    }
+
+    function onIndentLocationChange() {
+      updateIndentAvailability();
+    }
+
+    function onIndentItemChange() {
+      const code = comboCode(document.getElementById('indent-item').value);
+      const item = STATE.items.find(i => i.item_code === code);
+      document.getElementById('indent-item-desc').value = item ? item.item_description : '';
+      updateIndentAvailability();
+    }
+
+    async function updateIndentAvailability() {
+      const itemDisplay = document.getElementById('indent-item').value;
+      const location    = document.getElementById('indent-location').value;
+      const panel       = document.getElementById('indent-availability');
+
+      if (indentTxnType !== 'issue') {
+        panel.classList.remove('show');
+        return;
+      }
+
+      if (!itemDisplay || !location) { panel.classList.remove('show'); return; }
+      // const pls = STATE.pls.filter(p => p.item === itemDisplay && p.location_id == location);
+      // const received = pls.reduce((s, p) => s + (parseFloat(p.quantity) || 0), 0);
+
+      // const indents = STATE.indents.filter(i => i.item === itemDisplay && i.location_id == location);
+      // const issued = indents.reduce((s, i) => s + (parseFloat(i.issuedQty) || 0), 0);
+
+
+      const { data, error } = await supabaseClient
+      .from('available_items_v') // Pass your view name here
+      .select('purchased, consumed, received, issued')          // Specify columns to fetch
+      .eq('item_code', itemDisplay.split(' ')[0]) 
+      .eq('location_id', location);
+
+      // console.log(data);
+
+      const validItemCount = data[0].purchased - data[0].consumed;
+      const issued = data[0].issued - data[0].received;
+      
+
+      document.getElementById('indent-avail-received').textContent = validItemCount;
+      document.getElementById('indent-avail-issued').textContent   = issued;
+      const available = validItemCount - issued;
+
+      const avEl = document.getElementById('indent-avail-available');
+      avEl.textContent = available;
+      avEl.className = 'avail-stat-value ' + (available > 5 ? 'avail-ok' : available > 0 ? 'avail-warn' : 'avail-zero');
+
+      panel.classList.add('show');
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // INDENT — ISSUE / RECEIVE TOGGLE
+    // ─────────────────────────────────────────────────────────
+    function setIndentTxnType(type) {
+      indentTxnType = type;
+      document.getElementById('indent-txn-issue-btn').classList.toggle('active', type === 'issue');
+      document.getElementById('indent-txn-receive-btn').classList.toggle('active', type === 'receive');
+      document.querySelectorAll('.indent-issue-field').forEach(el => el.style.display = type === 'issue' ? '' : 'none');
+      document.querySelectorAll('.indent-receive-field').forEach(el => el.style.display = type === 'receive' ? '' : 'none');
+      document.getElementById('btn-add-indent').textContent = type === 'issue' ? '＋ Submit Issue' : '＋ Submit Return';
+      if (type === 'issue') {
+        document.getElementById('indent-req-qty').setAttribute('required','');
+        document.getElementById('indent-location').disabled = false;
+        document.getElementById('indent-item-search').disabled = false;
+        document.getElementById('indent-received-from').disabled = false;
+      } else {
+        const panel       = document.getElementById('indent-availability');
+        panel.classList.remove('show');
+        document.getElementById('indent-req-qty').removeAttribute('required');
+        document.getElementById('indent-location').disabled = true;
+        document.getElementById('indent-item-search').disabled = true;
+        document.getElementById('indent-received-from').disabled = true;
+        document.getElementById('indent-item').value = "";
+        document.getElementById('indent-item-desc').value = "";
+        document.getElementById('indent-location').value = "";
+        document.getElementById('indent-availability').removeAttribute('show')
+        populateDropdowns(); // refresh the "original indent" reference list
+      }
+    }
+
+    function calcBudget() {
+      const q = parseFloat(document.getElementById('pr-qty').value)||0;
+      const p = parseFloat(document.getElementById('pr-price').value)||0;
+      document.getElementById('pr-budget').value = (q*p).toLocaleString('en-IN',{minimumFractionDigits:2});
+    }
+    function calcTotal() {
+      const q = parseFloat(document.getElementById('pl-qty').value)||0;
+      const p = parseFloat(document.getElementById('pl-price').value)||0;
+      document.getElementById('pl-total').value = (q*p).toLocaleString('en-IN',{minimumFractionDigits:2});
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // SUBMIT HANDLERS
+    // ─────────────────────────────────────────────────────────
+    async function callRpc (procName, data) {
+        const { responseData , error } = await supabaseClient.rpc(procName, data);
+        console.log(responseData)
+        return { responseData , error };
+    }
+
+    function deleteCatalogue(category, subcategory) {
+      openConfirm(
+        'Delete Catalogue Entry',
+        `Remove "${category} → ${subcategory}"? Items already using this code won't be affected.`,
+        () => {
+          google.script.run
+            .withSuccessHandler(res => {
+              if (!res.success) return showToast(res.error, 'error');
+              showToast('Entry deleted', 'success');
+              refreshData();
+            })
+            .withFailureHandler(err => showToast('Error: ' + err.message, 'error'))
+            .deleteCatalogueEntry(category, subcategory);
+        }
+      );
+    }
+
+    // Ensures the category+subcategory pair typed/selected on the Item Master
+    // page exists, creating it first via the same RPC the old Category Master
+    // page used. Returns the resulting item_category_id, or null on failure.
+    async function ensureCategoryExists(category, subcategory) {
+      const existing = STATE.catalogue.find(c => c.category === category && c.subcategory === subcategory);
+      if (existing) return existing.item_category_id;
+
+      const result = await callRpc('create_item_category', {
+        p_category: category,
+        p_subcategory: subcategory
+      });
+      if (result.error) {
+        showToast('Error creating category: ' + result.error.message, 'error');
+        return null;
+      }
+      // Refresh catalogue so the new pair (and its auto code) is available
+      STATE.catalogue = await getItemCategories();
+      const created = STATE.catalogue.find(c => c.category === category && c.subcategory === subcategory);
+      return created ? created.item_category_id : null;
+    }
+
+    async function submitItem() {
+      const name = v('item-name'), category = v('item-category'), subcategory = v('item-subcategory');
+      if (!name || !category || !subcategory) return showToast('Fill required fields', 'error');
+      const btn = document.getElementById('btn-add-item');
+      const description = v('item-desc');
+      const itemType = v('item-type');
+      const itemRemarks = v('item-remarks');
+      setLoading(btn, true);
+
+      const categoryId = await ensureCategoryExists(category, subcategory);
+      if (!categoryId) { setLoading(btn, false); return; }
+
+      try {
+        const result = await callRpc('create_item', 
+          {
+              p_item_name: name,
+              p_item_description: description,
+              p_item_type: itemType,
+              p_category_id: categoryId,
+              p_remarks: itemRemarks
+          }
+        );
+        console.log(result);
+        if (!result.responseData) {
+          setLoading(btn, false);
+          showToast('Item Added', 'success');
+        }
+        if (result.error) {
+          setLoading(btn, false);
+          showToast('Error: ' + result.error.message, 'error');
+        } else {
+          setLoading(btn, false); 
+          showToast('Item Added', 'success');
+        }
+      } catch(err) {
+        setLoading(btn, false); 
+          showToast('Error: ' + err.message, 'error');
+      }
       refreshData();
-    })
-    .withFailureHandler(err => { setLoading(btn, false); showToast('Error: ' + err.message, 'error'); })
-    .addCatalogueEntry({ category, subcategory });
-}
+    }
 
-function deleteCatalogue(category, subcategory) {
-  openConfirm(
-    'Delete Catalogue Entry',
-    `Remove "${category} → ${subcategory}"? Items already using this code won't be affected.`,
-    () => {
-      google.script.run
-        .withSuccessHandler(res => {
-          if (!res.success) return showToast(res.error, 'error');
-          showToast('Entry deleted', 'success');
+    async function submitPR() {
+      // Read item from the hidden input (committed by selectComboboxItem)
+      const itemVal = document.getElementById('pr-item').value;
+      if (!v('pr-date')||!v('pr-location')||!itemVal||!v('pr-qty')||!v('pr-date-req'))
+        return showToast('Fill required fields', 'error');
+      const btn = document.getElementById('btn-add-pr');
+      // setLoading(btn, true);
+
+      //Prepare Data
+      const locations = STATE.locations;
+      const locationId = v('pr-location');
+
+      const items = STATE.items;
+      const itemCode = comboCode(itemVal);
+      const itemId = items.filter(items => items.item_code === itemCode)[0].item_id;
+
+      const prDateRequired = v('pr-date');
+
+      // console.log(prDateRequired);
+
+      try {
+        const result = await callRpc('create_purchase_request', 
+          {
+              p_location_id: locationId,
+              p_item_id: itemId,
+              p_pr_qty: v('pr-qty'),
+              p_price_qty: v('pr-price') ? v('pr-price') : null,
+              p_purpose_of_pr: v('pr-purpose') ? v('pr-purpose') : null,
+              p_date_of_requirement: prDateRequired,
+              p_remarks: v('pr-remarks') ? v('pr-remarks') : null
+          }
+        );
+        console.log(result);
+        if (!result.responseData && !result.error) {
+          setLoading(btn, false);
+          showToast('PR Added', 'success');
+        }
+        else if (result.error) {
+          setLoading(btn, false);
+          showToast('Error: ' + result.error.message, 'error');
+        }
+      } catch(err) {
+        setLoading(btn, false); 
+          showToast('Error: ' + err.message, 'error');
+      }
+      refreshData();
+    }
+
+    async function submitPL() {
+      if (!v('pl-location')||!v('pl-item')||!v('pl-qty')||!v('pl-source')||!v('pl-condition')||!v('pl-from')||!v('pl-qty')||!v('pl-price')) return showToast('Fill required fields', 'error');
+      const btn = document.getElementById('btn-add-pl');
+      setLoading(btn, true);
+      
+      const locationId = v('pl-location')
+      const items = STATE.items;
+      const itemCode = comboCode(v('pl-item'));
+      const itemId = items.filter(items => items.item_code === itemCode)[0].item_id;
+      console.log(locationId, itemId);
+
+      try {
+        const result = await callRpc('create_purchase_ledger_record', 
+          {
+              p_date_received: v('pl-date'),
+              p_location_id: locationId,
+              p_item_id: itemId,
+              p_pr_number: v('pl-linked-pr') ? v('pl-linked-pr') : null,
+              p_source: v('pl-source'),
+              p_condition: v('pl-condition'),
+              p_purchase_received_from: v('pl-from'),
+              p_quantity: v('pl-qty'),
+              p_price: v('pl-price'),
+              p_billing_date: v('pl-billing-date'),
+              p_ref_number: v('pl-bill-no') ? v('pl-bill-no') : null,
+              p_remarks: v('pl-remarks') ? v('pl-remarks') : null
+          }
+        );
+        console.log(result);
+        if (!result.responseData && !result.error) {
+          setLoading(btn, false);
+          showToast('PL Added', 'success');
           refreshData();
-        })
-        .withFailureHandler(err => showToast('Error: ' + err.message, 'error'))
-        .deleteCatalogueEntry(category, subcategory);
+          populateDropdowns();
+        }
+        else if (result.error) {
+          setLoading(btn, false);
+          showToast('Error: ' + result.error.message, 'error');
+        }
+      } catch(err) {
+        setLoading(btn, false); 
+          showToast('Error: ' + err.message, 'error');
+      }
     }
-  );
-}
 
-function submitItem() {
-  const name = v('item-name'), category = v('item-category'), subcategory = v('item-subcategory');
-  if (!name || !category || !subcategory) return showToast('Fill required fields', 'error');
-  const btn = document.getElementById('btn-add-item');
-  setLoading(btn, true);
-  google.script.run
-    .withSuccessHandler(res => {
-      setLoading(btn, false);
-      showToast('Item added: ' + res.itemCode, 'success');
-      clearFields(['item-name','item-type','item-desc','item-remarks']);
-      document.getElementById('item-category').value = '';
-      document.getElementById('item-subcategory').innerHTML = '<option value="">Select subcategory…</option>';
-      document.getElementById('item-code-preview').textContent = 'Auto ID';
-      refreshData();
-    })
-    .withFailureHandler(err => { setLoading(btn, false); showToast('Error: ' + err.message, 'error'); })
-    .addItem({ name, category, subcategory, type: v('item-type'), description: v('item-desc'), remarks: v('item-remarks') });
-}
-
-function submitPR() {
-  // Read item from the hidden input (committed by selectPRItem)
-  const itemVal = document.getElementById('pr-item').value;
-  if (!v('pr-date')||!v('pr-location')||!itemVal||!v('pr-qty')||!v('pr-date-req'))
-    return showToast('Fill required fields', 'error');
-  const btn = document.getElementById('btn-add-pr');
-  setLoading(btn, true);
-  google.script.run
-    .withSuccessHandler(res => {
-      setLoading(btn, false);
-      showToast('PR submitted: ' + res.prNumber, 'success');
-      clearFields(['pr-qty','pr-price','pr-purpose','pr-remarks','pr-budget','pr-item-desc']);
-      clearPRItemCombobox();
-      refreshData();
-    })
-    .withFailureHandler(err => { setLoading(btn, false); showToast('Error: ' + err.message, 'error'); })
-    .addPR({ prDate:v('pr-date'), location:v('pr-location'), item:itemVal, qty:v('pr-qty'), price:v('pr-price'), purpose:v('pr-purpose'), dateRequired:v('pr-date-req'), remarks:v('pr-remarks') });
-}
-
-function submitPL() {
-  if (!v('pl-location')||!v('pl-item')||!v('pl-qty')) return showToast('Fill required fields', 'error');
-  const btn = document.getElementById('btn-add-pl');
-  setLoading(btn, true);
-  google.script.run
-    .withSuccessHandler(res => {
-      setLoading(btn, false);
-      showToast('Entry added: ' + res.plNumber, 'success');
-      clearFields(['pl-source','pl-condition','pl-from','pl-qty','pl-price','pl-total','pl-bill-no','pl-remarks','pl-item-desc']);
-      document.getElementById('pl-item').value = '';
-      document.getElementById('pl-linked-pr').value = '';
-      refreshData();
-    })
-    .withFailureHandler(err => { setLoading(btn, false); showToast('Error: ' + err.message, 'error'); })
-    .addPL({ dateReceived:v('pl-date'), location:v('pl-location'), item:v('pl-item'), source:v('pl-source'), condition:v('pl-condition'), purchasedFrom:v('pl-from'), qty:v('pl-qty'), price:v('pl-price'), billingDate:v('pl-billing-date'), billNo:v('pl-bill-no'), remarks:v('pl-remarks'), linkedPR: v('pl-linked-pr') });
-}
-
-function submitIndent() {
-  if (!v('indent-date')||!v('indent-location')||!v('indent-item')||!v('indent-req-qty'))
-    return showToast('Fill required fields', 'error');
-  const btn = document.getElementById('btn-add-indent');
-  setLoading(btn, true);
-  google.script.run
-    .withSuccessHandler(res => {
-      setLoading(btn, false);
-      showToast('Indent submitted: ' + res.indentNo, 'success');
-      clearFields(['indent-requested-by','indent-req-qty','indent-iss-qty','indent-issued-to','indent-used-at','indent-purpose','indent-consumed-qty','indent-remarks','indent-item-desc']);
-      document.getElementById('indent-item').value = '';
-      document.getElementById('indent-linked-pl').value = '';
-      refreshData();
-    })
-    .withFailureHandler(err => { setLoading(btn, false); showToast('Error: ' + err.message, 'error'); })
-    .addIndent({ indentDate:v('indent-date'), location:v('indent-location'), requestedBy:v('indent-requested-by'), item:v('indent-item'), requestedQty:v('indent-req-qty'), issuedQty:v('indent-iss-qty'), issuedTo:v('indent-issued-to'), usedAt:v('indent-used-at'), purpose:v('indent-purpose'), consumedQty:v('indent-consumed-qty'), remarks:v('indent-remarks'), linkedPL: v('indent-linked-pl') });
-}
-
-// ─────────────────────────────────────────────────────────
-// PR WORKFLOW
-// ─────────────────────────────────────────────────────────
-function openApproveModal(prNumber) {
-  pendingApprovalPR = prNumber;
-  document.getElementById('approve-modal-desc').textContent = `Approve ${prNumber}?`;
-  document.getElementById('approve-modal').classList.add('show');
-}
-
-function doApprove() {
-  closeModal('approve-modal');
-  if (!pendingApprovalPR) return;
-  google.script.run
-    .withSuccessHandler(res => {
-      if (!res.success) return showToast(res.error, 'error');
-      showToast('PR approved ✓', 'success');
-      refreshData();
-    })
-    .withFailureHandler(err => showToast('Error: ' + err.message, 'error'))
-    .updatePRStatus(pendingApprovalPR, 'approve', '');
-  pendingApprovalPR = null;
-}
-
-function openRejectModal(prNumber) {
-  pendingRejectPR = prNumber;
-  document.getElementById('reject-modal-desc').textContent = `Reject ${prNumber}?`;
-  document.getElementById('reject-reason').value = '';
-  document.getElementById('reject-modal').classList.add('show');
-}
-
-function doReject() {
-  const reason = document.getElementById('reject-reason').value.trim();
-  if (!reason) { showToast('Please enter a reason', 'error'); return; }
-  closeModal('reject-modal');
-  if (!pendingRejectPR) return;
-  google.script.run
-    .withSuccessHandler(res => {
-      if (!res.success) return showToast(res.error, 'error');
-      showToast('PR rejected', 'success');
-      refreshData();
-    })
-    .withFailureHandler(err => showToast('Error: ' + err.message, 'error'))
-    .updatePRStatus(pendingRejectPR, 'reject', reason);
-  pendingRejectPR = null;
-}
-
-// ─────────────────────────────────────────────────────────
-// REFRESH
-// ─────────────────────────────────────────────────────────
-function refreshData() {
-  google.script.run
-    .withSuccessHandler(data => { STATE = data; populateDropdowns(); renderAll(); updatePRAvailability(); })
-    .withFailureHandler(() => showToast('Refresh failed', 'error'))
-    .getInitData();
-}
-
-// ─────────────────────────────────────────────────────────
-// RENDER
-// ─────────────────────────────────────────────────────────
-function renderAll() {
-  renderHome(); renderCatalogue(); renderItems(); renderPRs(); renderPLs(); renderIndents();
-}
-
-function renderHome() {
-  const pending = STATE.prs.filter(p => p.status === 'Pending').length;
-  document.getElementById('hs-items').textContent   = STATE.items.length;
-  document.getElementById('hs-prs').textContent     = STATE.prs.length;
-  document.getElementById('hs-pls').textContent     = STATE.pls.length;
-  document.getElementById('hs-indents').textContent = STATE.indents.length;
-  document.getElementById('hs-cats').textContent    = STATE.catalogue.length;
-  document.getElementById('hs-pending').textContent = pending;
-  document.getElementById('hc-catalogue').textContent = STATE.catalogue.length + ' entries';
-  document.getElementById('hc-items').textContent   = STATE.items.length + ' items';
-  document.getElementById('hc-prs').textContent     = STATE.prs.length + ' PRs';
-  document.getElementById('hc-pls').textContent     = STATE.pls.length + ' entries';
-  document.getElementById('hc-indents').textContent = STATE.indents.length + ' indents';
-}
-
-function renderCatalogue() {
-  const tbody = document.getElementById('cat-tbody');
-  const cat = STATE.catalogue;
-  document.getElementById('cat-count').textContent = cat.length;
-  if (!cat.length) {
-    tbody.innerHTML = `<tr><td colspan="4"><div class="empty"><div class="empty-icon">🗂</div><div class="empty-text">No catalogue entries yet</div></div></td></tr>`;
-    return;
-  }
-  tbody.innerHTML = cat.map(c => `
-    <tr>
-      <td>${c.category}</td><td>${c.subcategory}</td>
-      <td><span class="badge badge-purple">${c.code}</span></td>
-      <td><button class="btn btn-danger btn-sm" onclick="deleteCatalogue('${esc(c.category)}','${esc(c.subcategory)}')">Delete</button></td>
-    </tr>`).join('');
-}
-
-function renderItems() {
-  const tbody = document.getElementById('items-tbody');
-  const items = STATE.items;
-  document.getElementById('items-count').textContent = items.length;
-  if (!items.length) {
-    tbody.innerHTML = `<tr><td colspan="5"><div class="empty"><div class="empty-icon">📦</div><div class="empty-text">No items yet</div></div></td></tr>`;
-    document.getElementById('items-stats').innerHTML = ''; return;
-  }
-  tbody.innerHTML = items.map(i => `
-    <tr>
-      <td><span class="badge badge-blue">${i.code}</span></td>
-      <td><strong>${i.name}</strong></td><td>${i.category}</td><td>${i.subcategory}</td>
-      <td style="color:var(--ink3); max-width:180px; overflow:hidden; text-overflow:ellipsis;">${i.description||'—'}</td>
-    </tr>`).join('');
-  const cats = {};
-  items.forEach(i => cats[i.category] = (cats[i.category]||0)+1);
-  document.getElementById('items-stats').innerHTML = `
-    <div class="stat-card"><div class="stat-label">Total Items</div><div class="stat-value">${items.length}</div></div>
-    ${Object.entries(cats).map(([k,c])=>`<div class="stat-card"><div class="stat-label">${k}</div><div class="stat-value">${c}</div><div class="stat-sub">items</div></div>`).join('')}`;
-}
-
-function statusBadge(s) {
-  const map = { Pending:'status-pending', Approved:'status-approved', Rejected:'status-rejected', Fulfilled:'status-fulfilled' };
-  return `<span class="badge ${map[s]||'badge-gray'}">${s||'Pending'}</span>`;
-}
-
-function setPRFilter(f, el) {
-  prFilter = f;
-  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
-  renderPRs();
-}
-
-function filterPRTable(q) { prSearch = q.toLowerCase(); renderPRs(); }
-
-function renderPRs() {
-  const tbody = document.getElementById('pr-tbody');
-  let prs = STATE.prs;
-  document.getElementById('pr-count').textContent = prs.length;
-
-  const nums = prs.map(p=>parseInt(p.prNumber.split('_').pop())||0);
-  document.getElementById('pr-number-preview').textContent = 'PR_'+String((nums.length?Math.max(...nums)+1:1)).padStart(4,'0');
-
-  if (prFilter !== 'All') prs = prs.filter(p => (p.status||'Pending') === prFilter);
-  if (prSearch) prs = prs.filter(p => JSON.stringify(p).toLowerCase().includes(prSearch));
-
-  const isAdmin = currentUser && currentUser.role === 'admin';
-
-  if (!prs.length) {
-    tbody.innerHTML = `<tr><td colspan="9"><div class="empty"><div class="empty-icon">📋</div><div class="empty-text">No PRs match this filter</div></div></td></tr>`;
-    document.getElementById('pr-stats').innerHTML = ''; return;
-  }
-
-  tbody.innerHTML = prs.map(p => {
-    const status = p.status || 'Pending';
-    let actions = '';
-    if (isAdmin && status === 'Pending') {
-      actions = `
-        <button class="btn btn-success btn-sm" onclick="openApproveModal('${esc(p.prNumber)}')">✓ Approve</button>
-        <button class="btn btn-warn btn-sm" style="margin-left:.3rem;" onclick="openRejectModal('${esc(p.prNumber)}')">✗ Reject</button>`;
+    function submitIndent() {
+      if (indentTxnType === 'issue') return submitIndentIssue();
+      return submitIndentReceive();
     }
-    return `<tr>
-      <td><span class="badge badge-amber">${p.prNumber}</span></td>
-      <td>${p.prDate}</td><td>${p.location}</td>
-      <td style="max-width:130px; overflow:hidden; text-overflow:ellipsis;" title="${esc(p.item)}">${p.item}</td>
-      <td>${p.qty}</td>
-      <td>₹${Number(p.budget||0).toLocaleString('en-IN')}</td>
-      <td>${statusBadge(status)}</td>
-      <td>${p.createdByUser}</td>
-      <td>${p.approvedByUser}</td>
-      <td>${p.linkedPL ? `<span class="badge badge-blue">${p.linkedPL}</span>` : '—'}</td>
-      <td style="white-space:nowrap;">${actions}</td>
-    </tr>`;
-  }).join('');
 
-  const total = STATE.prs.reduce((s,p)=>s+(Number(p.budget)||0),0);
-  const byStatus = {};
-  STATE.prs.forEach(p => { const s = p.status||'Pending'; byStatus[s] = (byStatus[s]||0)+1; });
-  document.getElementById('pr-stats').innerHTML = `
-    <div class="stat-card"><div class="stat-label">Total PRs</div><div class="stat-value">${STATE.prs.length}</div></div>
-    <div class="stat-card"><div class="stat-label">Total Budget</div><div class="stat-value">₹${total.toLocaleString('en-IN')}</div></div>
-    ${Object.entries(byStatus).map(([s,c])=>`<div class="stat-card"><div class="stat-label">${s}</div><div class="stat-value">${c}</div></div>`).join('')}`;
-}
+    async function submitIndentIssue() {
+      if (!v('indent-date')||!v('indent-location')||!v('indent-item')||!v('indent-req-qty')||!v('indent-iss-qty')||!v('indent-issued-to'))
+        return showToast('Fill required fields', 'error');
+      const btn = document.getElementById('btn-add-indent');
+      setLoading(btn, true);
+      const itemDisplayName = v('indent-item');
+      const itemId = STATE.items.filter(i => (i.item_code + ' - ' + i.item_name) === itemDisplayName)[0].item_id;
+      try {
+        const result = await callRpc('create_indent_issue_record', 
+          {
+              p_indent_date: v('indent-date'),
+              p_location_id: parseInt(v('indent-location')),
+              p_item_id: itemId,
+              p_requested_qty: v('indent-req-qty'),
+              p_issued_qty: v('indent-iss-qty'),
+              p_issued_to: v('indent-issued-to'),
+              p_used_at_as: v('indent-used-at'),
+              p_purpose_of_use: v('indent-purpose'),
+              p_remarks: v('indent-remarks')
+          }
+        );
+        console.log(result);
+        if (!result.responseData && !result.error) {
+          setLoading(btn, false);
+          showToast('Indent submitted', 'success');
+          clearFields(['indent-requested-by','indent-req-qty','indent-iss-qty','indent-issued-to','indent-used-at','indent-purpose','indent-consumed-qty','indent-remarks','indent-item-desc']);
+          clearComboboxItem('indent');
+          refreshData();
+          populateDropdowns();
+        }
+        else if (result.error) {
+          setLoading(btn, false);
+          showToast('Error: ' + result.error.message, 'error');
+        }
+      } catch(err) {
+        setLoading(btn, false); 
+          showToast('Error: ' + err.message, 'error');
+      }
 
-function renderPLs() {
-  const tbody = document.getElementById('pl-tbody');
-  const pls = STATE.pls;
-  document.getElementById('pl-count').textContent = pls.length;
-  const nums = pls.map(p=>parseInt(p.plNumber.split('_').pop())||0);
-  document.getElementById('pl-number-preview').textContent = 'PL_'+String((nums.length?Math.max(...nums)+1:1)).padStart(4,'0');
-  if (!pls.length) {
-    tbody.innerHTML = `<tr><td colspan="9"><div class="empty"><div class="empty-icon">🧾</div><div class="empty-text">No ledger entries yet</div></div></td></tr>`;
-    document.getElementById('pl-stats').innerHTML = ''; return;
-  }
-  tbody.innerHTML = pls.map(p=>`<tr>
-    <td><span class="badge badge-green">${p.plNumber}</span></td>
-    <td>${p.dateReceived||'—'}</td><td>${p.location}</td>
-    <td style="max-width:130px; overflow:hidden; text-overflow:ellipsis;">${p.item}</td>
-    <td>${p.source||'—'}</td><td>${p.qty||'—'}</td>
-    <td>₹${Number(p.total||0).toLocaleString('en-IN')}</td>
-    <td>${p.billNo||'—'}</td>
-    <td>${p.linkedPR ? `<span class="badge badge-amber">${p.linkedPR}</span>` : '—'}</td>
-  </tr>`).join('');
-  const total = pls.reduce((s,p)=>s+(Number(p.total)||0),0);
-  document.getElementById('pl-stats').innerHTML = `
-    <div class="stat-card"><div class="stat-label">Total Entries</div><div class="stat-value">${pls.length}</div></div>
-    <div class="stat-card"><div class="stat-label">Total Value</div><div class="stat-value">₹${total.toLocaleString('en-IN')}</div><div class="stat-sub">received</div></div>`;
-}
+      // google.script.run
+      //   .withSuccessHandler(res => {
+      //     setLoading(btn, false);
+      //     showToast('Indent submitted', 'success');
+      //     clearFields(['indent-requested-by','indent-req-qty','indent-iss-qty','indent-issued-to','indent-used-at','indent-purpose','indent-consumed-qty','indent-remarks','indent-item-desc']);
+      //     clearComboboxItem('indent');
+      //     refreshData();
+      //   })
+      //   .withFailureHandler(err => { setLoading(btn, false); showToast('Error: ' + err.message, 'error'); })
+      //   .addIndent({ txnType:'issue', indentDate:v('indent-date'), location:v('indent-location'), requestedBy:v('indent-requested-by'), item:v('indent-item'), requestedQty:v('indent-req-qty'), issuedQty:v('indent-iss-qty'), issuedTo:v('indent-issued-to'), usedAt:v('indent-used-at'), purpose:v('indent-purpose'), remarks:v('indent-remarks') });
+    }
 
-function renderIndents() {
-  const tbody = document.getElementById('indent-tbody');
-  const indents = STATE.indents;
-  document.getElementById('indent-count').textContent = indents.length;
-  const nums = indents.map(i=>parseInt(i.indentNo.split('_').pop())||0);
-  document.getElementById('indent-number-preview').textContent = 'IN_'+String((nums.length?Math.max(...nums)+1:1)).padStart(4,'0');
-  if (!indents.length) {
-    tbody.innerHTML = `<tr><td colspan="9"><div class="empty"><div class="empty-icon">📤</div><div class="empty-text">No indents yet</div></div></td></tr>`;
-    document.getElementById('indent-stats').innerHTML = ''; return;
-  }
-  tbody.innerHTML = indents.map(i=>`<tr>
-    <td><span class="badge badge-red">${i.indentNo}</span></td>
-    <td>${i.indentDate}</td><td>${i.location}</td><td>${i.requestedBy||'—'}</td>
-    <td style="max-width:130px; overflow:hidden; text-overflow:ellipsis;">${i.item}</td>
-    <td>${i.requestedQty}</td><td>${i.issuedQty||'—'}</td>
-    <td>${i.linkedPL ? `<span class="badge badge-green">${i.linkedPL}</span>` : '—'}</td>
-    <td>${i.purpose||'—'}</td>
-  </tr>`).join('');
-  const issued = indents.reduce((s,i)=>s+(Number(i.issuedQty)||0),0);
-  document.getElementById('indent-stats').innerHTML = `
-    <div class="stat-card"><div class="stat-label">Total Indents</div><div class="stat-value">${indents.length}</div></div>
-    <div class="stat-card"><div class="stat-label">Total Issued</div><div class="stat-value">${issued}</div><div class="stat-sub">units issued</div></div>`;
-}
+    async function submitIndentReceive() {
+      if (!v('indent-date')||!v('indent-location')||!v('indent-item')||!v('indent-recv-qty')||!v('indent-consumed-qty'))
+        return showToast('Fill required fields', 'error');
+      const btn = document.getElementById('btn-add-indent');
+      setLoading(btn, true);
+      const indentNumber = v('indent-return-ref');
+      const indentId = STATE.indents.find(i => i.indent_number === indentNumber).indent_id;
+      console.log(indentId);
+      
+      try {
+        const result = await callRpc('create_indent_received_record', 
+          {
+              p_indent_date: v('indent-date'),
+              p_ref_indent_id: indentId,
+              p_consumed_qty: v('indent-consumed-qty'),
+              p_received_qty: v('indent-recv-qty'),
+              p_return_condition: v('indent-return-condition') ? v('indent-return-condition') : null,
+              p_return_reason: v('indent-return-reason'),
+              p_remarks: v('indent-remarks') ? v('indent-remarks') : null
+          }
+        );
+        console.log(result);
+        if (!result.responseData && !result.error) {
+          setLoading(btn, false);
+          showToast('Return recorded', 'success');
+          clearFields(['indent-received-from','indent-recv-qty','indent-return-condition','indent-return-reason','indent-remarks','indent-item-desc']);
+          clearComboboxItem('indent');
+          document.getElementById('indent-return-ref').value = '';
+          refreshData();
+        }
+        else if (result.error) {
+          setLoading(btn, false);
+          showToast('Error: ' + result.error.message, 'error');
+        }
+      } catch(err) {
+        setLoading(btn, false); 
+          showToast('Error: ' + err.message, 'error');
+      }
 
-// ─────────────────────────────────────────────────────────
-// TABLE FILTER
-// ─────────────────────────────────────────────────────────
-function filterTable(tableId, query) {
-  const q = query.toLowerCase();
-  document.getElementById(tableId).querySelectorAll('tbody tr').forEach(row => {
-    row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
-  });
-}
+      // google.script.run
+      //   .withSuccessHandler(res => {
+          // setLoading(btn, false);
+          // showToast('Return recorded: ' + res.indentNo, 'success');
+          // clearFields(['indent-received-from','indent-recv-qty','indent-return-condition','indent-return-reason','indent-remarks','indent-item-desc']);
+          // clearComboboxItem('indent');
+          // document.getElementById('indent-return-ref').value = '';
+          // refreshData();
+      //   })
+      //   .withFailureHandler(err => { setLoading(btn, false); showToast('Error: ' + err.message, 'error'); })
+      //   .addIndent({ txnType:'receive', indentDate:v('indent-date'), location:v('indent-location'), item:v('indent-item'), originalIndentRef:v('indent-return-ref'), receivedQty:v('indent-recv-qty'), receivedFrom:v('indent-received-from'), returnCondition:v('indent-return-condition'), returnReason:v('indent-return-reason'), remarks:v('indent-remarks') });
+    }
 
-// ─────────────────────────────────────────────────────────
-// MODALS
-// ─────────────────────────────────────────────────────────
-function openConfirm(title, desc, cb) {
-  document.getElementById('confirm-title').textContent = title;
-  document.getElementById('confirm-desc').textContent = desc;
-  confirmCallback = cb;
-  document.getElementById('confirm-modal').classList.add('show');
-}
-function confirmOk() { closeModal('confirm-modal'); if (confirmCallback) confirmCallback(); confirmCallback = null; }
-function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+    // ─────────────────────────────────────────────────────────
+    // PR WORKFLOW
+    // ─────────────────────────────────────────────────────────
+    function openApproveModal(prNumber) {
+      pendingApprovalPR = prNumber;
+      document.getElementById('approve-modal-desc').textContent = `Approve ${prNumber}?`;
+      document.getElementById('approve-modal').classList.add('show');
+    }
 
-// ─────────────────────────────────────────────────────────
-// UTILS
-// ─────────────────────────────────────────────────────────
-function v(id) { return document.getElementById(id).value.trim(); }
-function clearFields(ids) { ids.forEach(id => { const el = document.getElementById(id); if(el) el.value=''; }); }
-function esc(str) { return String(str).replace(/'/g,"\\'"); }
+    async function doApprove() {
+      closeModal('approve-modal');
+      if (!pendingApprovalPR) return;
+      // console.log(pr_id);
+      try {
+        const result = await callRpc('approve_purchase_request',
+          {
+            p_pr_number: pendingApprovalPR
+          }
+        );
+        console.log(result);
+        if (!result.responseData && !result.error) {
+          showToast('PR approved ✓', 'success');
+          refreshData();
+        }
+        else if (result.error) {
+          showToast('Error: ' + result.error.message, 'error');
+        }
+      } catch(err) {
+          showToast('Error: ' + err.message, 'error');
+      }
+      pendingApprovalPR = null;
+    }
 
-function setLoading(btn, loading) {
-  if (loading) { btn._orig = btn.innerHTML; btn.innerHTML = '<div class="spinner"></div> Saving…'; btn.disabled = true; }
-  else { btn.innerHTML = btn._orig; btn.disabled = false; }
-}
+    function openRejectModal(prNumber) {
+      pendingRejectPR = prNumber;
+      document.getElementById('reject-modal-desc').textContent = `Reject ${prNumber}?`;
+      document.getElementById('reject-reason').value = '';
+      document.getElementById('reject-modal').classList.add('show');
+    }
 
-let toastTimer;
-function showToast(msg, type='success') {
-  const t = document.getElementById('toast');
-  t.textContent = (type==='success'?'✓  ':'✗  ') + msg;
-  t.className = 'show ' + type;
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.className = '', 3500);
-}
+    async function doReject() {
+      const reason = document.getElementById('reject-reason').value.trim();
+      if (!reason) { showToast('Please enter a reason', 'error'); return; }
+      closeModal('reject-modal');
+      if (!pendingRejectPR) return;
+
+      try {
+        const result = await callRpc('reject_purchase_request',
+          {
+            p_pr_number: pendingRejectPR,
+            p_rejection_reason: reason
+          }
+        );
+        console.log(result);
+        if (!result.responseData && !result.error) {
+          showToast('PR rejected', 'success');
+          refreshData();
+        }
+        else if (result.error) {
+          showToast('Error: ' + result.error.message, 'error');
+        }
+      } catch(err) {
+          showToast('Error: ' + err.message, 'error');
+      }
+      pendingRejectPR = null;
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // REFRESH
+    // ─────────────────────────────────────────────────────────
+    async function refreshData() {
+      await getInitData();
+      console.log(STATE);
+      await renderAll();
+      populateDropdowns();
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // RENDER
+    // ─────────────────────────────────────────────────────────
+    function renderAll() {
+      renderHome(); renderCatalogue(); renderItems(); renderPRs(); renderPLs(); renderIndents();
+    }
+
+    function renderHome() {
+      const pending = STATE.prs.filter(p => p.status === 'Pending').length;
+      document.getElementById('hs-items').textContent   = STATE.items.length;
+      document.getElementById('hs-prs').textContent     = STATE.prs.length;
+      document.getElementById('hs-pls').textContent     = STATE.pls.length;
+      document.getElementById('hs-indents').textContent = STATE.indents.length;
+      document.getElementById('hs-cats').textContent    = STATE.catalogue.length;
+      document.getElementById('hs-pending').textContent = pending;
+      document.getElementById('hc-items').textContent   = STATE.items.length + ' items';
+      document.getElementById('hc-prs').textContent     = STATE.prs.length + ' PRs';
+      document.getElementById('hc-pls').textContent     = STATE.pls.length + ' entries';
+      document.getElementById('hc-indents').textContent = STATE.indents.length + ' indents';
+    }
+
+    async function renderCatalogue() {
+      const tbody = document.getElementById('cat-tbody');
+      const cat = STATE.catalogue;
+      if (!cat.length) {
+        tbody.innerHTML = `<tr><td colspan="4"><div class="empty"><div class="empty-icon">🗂</div><div class="empty-text">No categories yet</div></div></td></tr>`;
+        return;
+      }
+      tbody.innerHTML = cat.map(c => `
+        <tr>
+          <td>${c.category}</td><td>${c.subcategory}</td>
+          <td><span class="badge badge-purple">${c.code}</span></td>
+          <td><button class="btn btn-danger btn-sm" onclick="deleteCatalogue('${esc(c.category)}','${esc(c.subcategory)}')">Delete</button></td>
+        </tr>`).join('');
+    }
+
+    async function renderItems() {
+      const tbody = document.getElementById('items-tbody');
+      const items = STATE.items;
+      console.log(STATE.items);
+      document.getElementById('items-count').textContent = currentItemsSubtab === 'items' ? items.length : STATE.catalogue.length;
+      if (!items.length) {
+        tbody.innerHTML = `<tr><td colspan="5"><div class="empty"><div class="empty-icon">📦</div><div class="empty-text">No items yet</div></div></td></tr>`;
+      } else {
+        tbody.innerHTML = items.map(i => `
+          <tr>
+            <td><span class="badge badge-blue">${i.item_code}</span></td>
+            <td><strong>${i.item_name}</strong></td><td>${i.category}</td><td>${i.subcategory}</td>
+            <td style="color:var(--ink3); max-width:180px; overflow:hidden; text-overflow:ellipsis;">${i.item_description||'—'}</td>
+          </tr>`).join('');
+      }
+      const cats = {};
+      items.forEach(i => cats[i.category] = (cats[i.category]||0)+1);
+      document.getElementById('items-stats').innerHTML = `
+        <div class="stat-card"><div class="stat-label">Total Items</div><div class="stat-value">${items.length}</div></div>
+        <div class="stat-card"><div class="stat-label">Categories</div><div class="stat-value">${STATE.catalogue.length}</div></div>
+        ${Object.entries(cats).map(([k,c])=>`<div class="stat-card"><div class="stat-label">${k}</div><div class="stat-value">${c}</div><div class="stat-sub">items</div></div>`).join('')}`;
+    }
+
+    function statusBadge(s) {
+      const map = { Pending:'status-pending', Approved:'status-approved', Rejected:'status-rejected', Fulfilled:'status-fulfilled' };
+      return `<span class="badge ${map[s]||'badge-gray'}">${s||'Pending'}</span>`;
+    }
+
+    function setPRFilter(f, el) {
+      prFilter = f;
+      document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+      renderPRs();
+    }
+
+    function filterPRTable(q) { prSearch = q.toLowerCase(); renderPRs(); }
+
+    function renderPRs() {
+      const tbody = document.getElementById('pr-tbody');
+      let prs = STATE.prs;
+      document.getElementById('pr-count').textContent = prs.length;
+
+      const nums = prs.map(p=>parseInt(p.pr_number.split('_').pop())||0);
+      document.getElementById('pr-number-preview').textContent = 'PR_'+String((nums.length?Math.max(...nums)+1:1)).padStart(5,'0');
+
+      if (prFilter !== 'All') prs = prs.filter(p => (p.status||'Pending') === prFilter);
+      if (prSearch) prs = prs.filter(p => JSON.stringify(p).toLowerCase().includes(prSearch));
+
+      const isAdmin = currentUser && currentUser.role === 'A';
+
+      if (!prs.length) {
+        tbody.innerHTML = `<tr><td colspan="9"><div class="empty"><div class="empty-icon">📋</div><div class="empty-text">No PRs match this filter</div></div></td></tr>`;
+        document.getElementById('pr-stats').innerHTML = ''; return;
+      }
+
+      tbody.innerHTML = prs.map(p => {
+        const status = p.status || 'Pending';
+        let actions = '';
+        if (isAdmin && status === 'Pending') {
+          actions = `
+            <button class="btn btn-success btn-sm" onclick="openApproveModal('${esc(p.pr_number)}')">✓ Approve</button>
+            <button class="btn btn-warn btn-sm" style="margin-left:.3rem;" onclick="openRejectModal('${esc(p.pr_number)}')">✗ Reject</button>`;
+        }
+        return `<tr>
+          <td><span class="badge badge-amber">${p.pr_number}</span></td>
+          <td>${p.pr_date}</td><td>${p.location_name}</td>
+          <td style="max-width:130px; overflow:hidden; text-overflow:ellipsis;" title="${esc(p.item_name)}">${p.item_name}</td>
+          <td>${p.pr_qty}</td>
+          <td>₹${Number(p.budget||0).toLocaleString('en-IN')}</td>
+          <td>${statusBadge(status)}</td>
+          <td>${p.requested_by}</td>
+          <td>${p.evaluated_by ? `<span class="badge badge-blue">${p.evaluated_by}</span>` : '—'}</td>
+          <td>${p.linked_pl ? `<span class="badge badge-blue">${p.linked_pl}</span>` : '—'}</td>
+          <td style="white-space:nowrap;">${actions}</td>
+        </tr>`;
+      }).join('');
+
+      const total = STATE.prs.reduce((s,p)=>s+(Number(p.budget)||0),0);
+      const byStatus = {};
+      STATE.prs.forEach(p => { const s = p.status||'Pending'; byStatus[s] = (byStatus[s]||0)+1; });
+      document.getElementById('pr-stats').innerHTML = `
+        <div class="stat-card"><div class="stat-label">Total PRs</div><div class="stat-value">${STATE.prs.length}</div></div>
+        <div class="stat-card"><div class="stat-label">Total Budget</div><div class="stat-value">₹${total.toLocaleString('en-IN')}</div></div>
+        ${Object.entries(byStatus).map(([s,c])=>`<div class="stat-card"><div class="stat-label">${s}</div><div class="stat-value">${c}</div></div>`).join('')}`;
+
+      const today = new Date().toLocaleDateString('en-CA');
+      document.getElementById('pr-date-req').setAttribute('min', today);  
+    }
+
+    function renderPLs() {
+      const tbody = document.getElementById('pl-tbody');
+      const pls = STATE.pls;
+      document.getElementById('pl-count').textContent = pls.length;
+      const nums = pls.map(p=>parseInt(p.pl_number.split('_').pop())||0);
+      document.getElementById('pl-number-preview').textContent = 'PL_'+String((nums.length?Math.max(...nums)+1:1)).padStart(5,'0');
+      if (!pls.length) {
+        tbody.innerHTML = `<tr><td colspan="9"><div class="empty"><div class="empty-icon">🧾</div><div class="empty-text">No ledger entries yet</div></div></td></tr>`;
+        document.getElementById('pl-stats').innerHTML = ''; return;
+      }
+      tbody.innerHTML = pls.map(p=>`<tr>
+        <td><span class="badge badge-green">${p.pl_number}</span></td>
+        <td>${p.date_of_material_received||'—'}</td><td>${p.location_name}</td>
+        <td style="max-width:130px; overflow:hidden; text-overflow:ellipsis;">${p.item}</td>
+        <td>${p.source||'—'}</td><td>${p.quantity||'—'}</td>
+        <td>₹${Number(p.total||0).toLocaleString('en-IN')}</td>
+        <td>${p.reference_number||'—'}</td>
+        <td>${p.pr_number ? `<span class="badge badge-amber">${p.pr_number}</span>` : '—'}</td>
+      </tr>`).join('');
+      const total = pls.reduce((s,p)=>s+(Number(p.total)||0),0);
+      document.getElementById('pl-stats').innerHTML = `
+        <div class="stat-card"><div class="stat-label">Total Entries</div><div class="stat-value">${pls.length}</div></div>
+        <div class="stat-card"><div class="stat-label">Total Value</div><div class="stat-value">₹${total.toLocaleString('en-IN')}</div><div class="stat-sub">received</div></div>`;
+    }
+
+    function renderIndents() {
+      document.getElementById('indent-requested-by').value = currentUser.username;
+      const tbody = document.getElementById('indent-tbody');
+      const indents = STATE.indents;
+      document.getElementById('indent-count').textContent = indents.length;
+      const nums = indents.map(i=>parseInt(i.indent_number.split('_').pop())||0);
+      document.getElementById('indent-number-preview').textContent = 'IN_'+String((nums.length?Math.max(...nums)+1:1)).padStart(5,'0');
+      if (!indents.length) {
+        tbody.innerHTML = `<tr><td colspan="10"><div class="empty"><div class="empty-icon">📤</div><div class="empty-text">No indents yet</div></div></td></tr>`;
+        document.getElementById('indent-stats').innerHTML = ''; return;
+      }
+      tbody.innerHTML = indents.map(i=>{
+        const type = i.type === 'Received' ? 'Received' : 'Issued';
+        const typeBadge = i.type === 'Received'
+          ? `<span class="badge badge-green">📥 Received</span>`
+          : `<span class="badge badge-red">📤 Issued</span>`;
+        // const qty = i.type === 'Received' ? (i.receivedQty||'—') : (i.issuedQty||'—');
+        return `<tr>
+        <td><span class="badge badge-gray">${i.indent_number}</span></td>
+        <td>${typeBadge}</td>
+        <td>${i.indent_date}</td><td>${i.location_name}</td>
+        <td>${i.requested_by||i.receivedFrom||'—'}</td>
+        <td style="max-width:130px; overflow:hidden; text-overflow:ellipsis;">${i.item}</td>
+        <td>${i.requested_qty||'—'}</td>
+        <td>${i.issued_qty||i.received_qty}</td>
+        <!--<td>${i.linkedPL ? `<span class="badge badge-green">${i.linkedPL}</span>` : '—'}</td>-->
+        <td>${i.purpose_of_use||i.return_reason||'—'}</td>
+      </tr>`;
+      }).join('');
+      const issued = indents.filter(i => (i.type||'Issued')==='Issued').reduce((s,i)=>s+(Number(i.issued_qty)||0),0);
+      const received = indents.filter(i => i.type==='Received').reduce((s,i)=>s+(Number(i.received_qty)||0),0);
+      document.getElementById('indent-stats').innerHTML = `
+        <div class="stat-card"><div class="stat-label">Total Indents</div><div class="stat-value">${indents.length}</div></div>
+        <div class="stat-card"><div class="stat-label">Total Issued</div><div class="stat-value">${issued}</div><div class="stat-sub">units issued</div></div>
+        <div class="stat-card"><div class="stat-label">Total Received</div><div class="stat-value">${received}</div><div class="stat-sub">units returned</div></div>`;
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // TABLE FILTER
+    // ─────────────────────────────────────────────────────────
+    function filterTable(tableId, query) {
+      const q = query.toLowerCase();
+      document.getElementById(tableId).querySelectorAll('tbody tr').forEach(row => {
+        row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+      });
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // MODALS
+    // ─────────────────────────────────────────────────────────
+    function openConfirm(title, desc, cb) {
+      document.getElementById('confirm-title').textContent = title;
+      document.getElementById('confirm-desc').textContent = desc;
+      confirmCallback = cb;
+      document.getElementById('confirm-modal').classList.add('show');
+    }
+    function confirmOk() { closeModal('confirm-modal'); if (confirmCallback) confirmCallback(); confirmCallback = null; }
+    function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+    // ─────────────────────────────────────────────────────────
+    // UTILS
+    // ─────────────────────────────────────────────────────────
+    function v(id) { return document.getElementById(id).value.trim(); }
+    function clearFields(ids) { ids.forEach(id => { const el = document.getElementById(id); if(el) el.value=''; }); }
+    function esc(str) { return String(str).replace(/'/g,"\\'"); }
+
+    function setLoading(btn, loading) {
+      if (loading) { btn._orig = btn.innerHTML; btn.innerHTML = '<div class="spinner"></div> Saving…'; btn.disabled = true; }
+      else { btn.innerHTML = btn._orig; btn.disabled = false; }
+    }
+
+    let toastTimer;
+    function showToast(msg, type='success') {
+      const t = document.getElementById('toast');
+      t.textContent = (type==='success'?'✓  ':'✗  ') + msg;
+      t.className = 'show ' + type;
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.className = '', 3500);
+    }
   </script>
 </body>
 </html>
