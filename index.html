@@ -1354,7 +1354,7 @@
                 </div>
                 <div class="table-wrap" style="max-height:600px; overflow-y:auto;">
                   <table id="indent-table">
-                    <thead><tr><th>Indent No.</th><th>Type</th><th>Date</th><th>Location</th><th>Requested By</th><th>Item</th><th>Req. Qty</th><th>Issued/Recv Qty</th>
+                    <thead><tr><th>Indent No.</th><th>Type</th><th>Date</th><th>Location</th><th>Requested By</th><th>Issued to / Received From</th><th>Item</th><th>Req. Qty</th><th>Issued/Recv Qty</th>
                       <!-- <th>Linked PL</th> -->
                       <th>Purpose</th></tr></thead>
                     <tbody id="indent-tbody"><tr><td colspan="10"><div class="load-center"><div class="spinner"></div>Loading…</div></td></tr></tbody>
@@ -1782,7 +1782,8 @@
     async function getIndents() {
       const { data, error } = await supabaseClient
         .from('indents_v')
-        .select();
+        .select()
+        .order('indent_number');
       if (data) {
         return data;
       }
@@ -1872,11 +1873,6 @@
       renderAll();
       populateDropdowns();
       setIndentTxnType('issue');
-      // STATE = 
-      // google.script.run
-      //   .withSuccessHandler(data => { STATE = data; populateDropdowns(); renderAll(); })
-      //   .withFailureHandler(() => showToast('Failed to load data', 'error'))
-      //   .getInitData();
     }
 
     // ─────────────────────────────────────────────────────────
@@ -2044,9 +2040,11 @@
     }
 
     function onIndentReceiveRefChange() {
-      const indentReturnRef = v('indent-return-ref');
+      const indentReturnRef = v('indent-return-ref').split(":", 1)[0];
+      console.log(indentReturnRef);
+      console.log(STATE.indents)
       const indent = STATE.indents.find(i => i.indent_number === indentReturnRef);
-      // console.log(indent);
+      console.log(indent);
       const locationId = STATE.locations.find(l => l.location_name == indent.location_name).location_id;
       // console.log(locationId);
       document.getElementById('indent-location').value = locationId;
@@ -2077,23 +2075,17 @@
       }
 
       if (!itemDisplay || !location) { panel.classList.remove('show'); return; }
-      // const pls = STATE.pls.filter(p => p.item === itemDisplay && p.location_id == location);
-      // const received = pls.reduce((s, p) => s + (parseFloat(p.quantity) || 0), 0);
-
-      // const indents = STATE.indents.filter(i => i.item === itemDisplay && i.location_id == location);
-      // const issued = indents.reduce((s, i) => s + (parseFloat(i.issuedQty) || 0), 0);
-
 
       const { data, error } = await supabaseClient
-      .from('available_items_v') // Pass your view name here
-      .select('purchased, consumed, received, issued')          // Specify columns to fetch
+      .from('available_items_v')
+      .select('purchased, consumed, received, issued')
       .eq('item_code', itemDisplay.split(' ')[0]) 
       .eq('location_id', location);
 
       // console.log(data);
 
       const validItemCount = data[0].purchased - data[0].consumed;
-      const issued = data[0].issued - data[0].received;
+      const issued = data[0].issued - data[0].received - data[0].consumed;
       
 
       document.getElementById('indent-avail-received').textContent = validItemCount;
@@ -2157,22 +2149,22 @@
         return { responseData , error };
     }
 
-    function deleteCatalogue(category, subcategory) {
-      openConfirm(
-        'Delete Catalogue Entry',
-        `Remove "${category} → ${subcategory}"? Items already using this code won't be affected.`,
-        () => {
-          google.script.run
-            .withSuccessHandler(res => {
-              if (!res.success) return showToast(res.error, 'error');
-              showToast('Entry deleted', 'success');
-              refreshData();
-            })
-            .withFailureHandler(err => showToast('Error: ' + err.message, 'error'))
-            .deleteCatalogueEntry(category, subcategory);
-        }
-      );
-    }
+    // function deleteCatalogue(category, subcategory) {
+    //   openConfirm(
+    //     'Delete Catalogue Entry',
+    //     `Remove "${category} → ${subcategory}"? Items already using this code won't be affected.`,
+    //     () => {
+    //       google.script.run
+    //         .withSuccessHandler(res => {
+    //           if (!res.success) return showToast(res.error, 'error');
+    //           showToast('Entry deleted', 'success');
+    //           refreshData();
+    //         })
+    //         .withFailureHandler(err => showToast('Error: ' + err.message, 'error'))
+    //         .deleteCatalogueEntry(category, subcategory);
+    //     }
+    //   );
+    // }
 
     // Ensures the category+subcategory pair typed/selected on the Item Master
     // page exists, creating it first via the same RPC the old Category Master
@@ -2372,17 +2364,6 @@
         setLoading(btn, false); 
           showToast('Error: ' + err.message, 'error');
       }
-
-      // google.script.run
-      //   .withSuccessHandler(res => {
-      //     setLoading(btn, false);
-      //     showToast('Indent submitted', 'success');
-      //     clearFields(['indent-requested-by','indent-req-qty','indent-iss-qty','indent-issued-to','indent-used-at','indent-purpose','indent-consumed-qty','indent-remarks','indent-item-desc']);
-      //     clearComboboxItem('indent');
-      //     refreshData();
-      //   })
-      //   .withFailureHandler(err => { setLoading(btn, false); showToast('Error: ' + err.message, 'error'); })
-      //   .addIndent({ txnType:'issue', indentDate:v('indent-date'), location:v('indent-location'), requestedBy:v('indent-requested-by'), item:v('indent-item'), requestedQty:v('indent-req-qty'), issuedQty:v('indent-iss-qty'), issuedTo:v('indent-issued-to'), usedAt:v('indent-used-at'), purpose:v('indent-purpose'), remarks:v('indent-remarks') });
     }
 
     async function submitIndentReceive() {
@@ -2390,7 +2371,8 @@
         return showToast('Fill required fields', 'error');
       const btn = document.getElementById('btn-add-indent');
       setLoading(btn, true);
-      const indentNumber = v('indent-return-ref');
+      const indentNumber = v('indent-return-ref').split(":", 1)[0];
+      console.log(indentNumber);
       const indentId = STATE.indents.find(i => i.indent_number === indentNumber).indent_id;
       console.log(indentId);
       
@@ -2684,8 +2666,10 @@
         return `<tr>
         <td><span class="badge badge-gray">${i.indent_number}</span></td>
         <td>${typeBadge}</td>
-        <td>${i.indent_date}</td><td>${i.location_name}</td>
-        <td>${i.requested_by||i.receivedFrom||'—'}</td>
+        <td>${i.indent_date}</td>
+        <td>${i.location_name}</td>
+        <td>${i.requested_by||'—'}</td>
+        <td>${i.issued_to||i.received_from}</td>
         <td style="max-width:130px; overflow:hidden; text-overflow:ellipsis;">${i.item}</td>
         <td>${i.requested_qty||'—'}</td>
         <td>${i.issued_qty||i.received_qty}</td>
