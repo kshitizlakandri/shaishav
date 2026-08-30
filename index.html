@@ -1354,7 +1354,7 @@
                 </div>
                 <div class="table-wrap" style="max-height:600px; overflow-y:auto;">
                   <table id="indent-table">
-                    <thead><tr><th>Indent No.</th><th>Type</th><th>Date</th><th>Location</th><th>Requested By</th><th>Issued to / Received From</th><th>Item</th><th>Req. Qty</th><th>Issued/Recv Qty</th>
+                    <thead><tr><th>Indent No.</th><th>Type</th><th>Date</th><th>Location</th><th>Requested By</th><th>Issued to / Received From</th><th>Item</th><th>Req. Qty</th><th>Consumed Qty</th><th>Issued/Recv Qty</th>
                       <!-- <th>Linked PL</th> -->
                       <th>Purpose</th></tr></thead>
                     <tbody id="indent-tbody"><tr><td colspan="10"><div class="load-center"><div class="spinner"></div>Loading…</div></td></tr></tbody>
@@ -2672,6 +2672,7 @@
         <td>${i.issued_to||i.received_from}</td>
         <td style="max-width:130px; overflow:hidden; text-overflow:ellipsis;">${i.item}</td>
         <td>${i.requested_qty||'—'}</td>
+        <td>${i.consumed_qty||'—'}</td>
         <td>${i.issued_qty||i.received_qty}</td>
         <!--<td>${i.linkedPL ? `<span class="badge badge-green">${i.linkedPL}</span>` : '—'}</td>-->
         <td>${i.purpose_of_use||i.return_reason||'—'}</td>
