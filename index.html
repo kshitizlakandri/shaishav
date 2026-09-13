@@ -874,6 +874,7 @@
           <button onclick="showPage('items')"     id="nav-items">📦 <span>Item Master</span></button>
           <button onclick="showPage('pr')"        id="nav-pr">📋 <span>Purchase Requisition</span></button>
           <button onclick="showPage('pl')"        id="nav-pl">🧾 <span>Purchase Order</span></button>
+          <button onclick="showPage('mr')"        id="nav-mr">📥 <span>Material Receipt</span></button>
           <button onclick="showPage('indent')"    id="nav-indent">📤 <span>Indent</span></button>
           <button onclick="goToReportsPage()"    id="nav-reports">📊 <span>Reports</span></button>
         </nav>
@@ -900,6 +901,7 @@
               <div class="home-stat"><div class="home-stat-label">Items</div><div class="home-stat-value" id="hs-items">—</div></div>
               <div class="home-stat"><div class="home-stat-label">PRs Raised</div><div class="home-stat-value" id="hs-prs">—</div></div>
               <div class="home-stat"><div class="home-stat-label">Ledger Entries</div><div class="home-stat-value" id="hs-pls">—</div></div>
+              <div class="home-stat"><div class="home-stat-label">Material Receipts</div><div class="home-stat-value" id="hs-mrs">—</div></div>
               <div class="home-stat"><div class="home-stat-label">Indents</div><div class="home-stat-value" id="hs-indents">—</div></div>
               <div class="home-stat"><div class="home-stat-label">Categories</div><div class="home-stat-value" id="hs-cats">—</div></div>
               <div class="home-stat"><div class="home-stat-label">Pending PRs</div><div class="home-stat-value" id="hs-pending" style="color:var(--gold)">—</div></div>
@@ -916,13 +918,19 @@
                 <div class="home-card-icon">📋</div>
                 <div class="home-card-title">Purchase Requisition</div>
                 <div class="home-card-desc">Raise purchase requests. Admins approve, reject, or mark fulfilled.</div>
-                <div class="home-card-count" style="background:rgba(146,64,14,.08); color:#92400e;" id="hc-prs">— PRs</div>
+                <div class="home-card-count" id="hc-prs">— PRs</div>
               </div>
               <div class="home-card" style="--card-accent:var(--green)" onclick="showPage('pl')">
                 <div class="home-card-icon">🧾</div>
                 <div class="home-card-title">Purchase Order</div>
                 <div class="home-card-desc">Record received materials. Optionally link to an approved PR.</div>
                 <div class="home-card-count" style="background:rgba(27,122,78,.08); color:var(--green);" id="hc-pls">— entries</div>
+              </div>
+              <div class="home-card" style="--card-accent:var(--gold)" onclick="showPage('mr')">
+                <div class="home-card-icon">📥</div>
+                <div class="home-card-title">Material Receipt</div>
+                <div class="home-card-desc">Verify what actually arrived against a Purchase Order — accepted vs rejected quantities.</div>
+                <div class="home-card-count" style="background:rgba(201,168,76,.14); color:#92720f;" id="hc-mrs">— MRs</div>
               </div>
               <div class="home-card" style="--card-accent:var(--accent2)" onclick="showPage('indent')">
                 <div class="home-card-icon">📤</div>
@@ -1236,6 +1244,98 @@
             </div>
           </div>
 
+          <!-- ── MATERIAL RECEIPT (MR) PAGE ── -->
+          <div class="page" id="page-mr">
+            <div class="page-header">
+              <div>
+                <div class="page-title">Material Receipt</div>
+                <div class="page-subtitle">Verify quantity and condition of materials as they physically arrive against a Purchase Order</div>
+              </div>
+            </div>
+            <div class="stats-strip" id="mr-stats"></div>
+            <div class="split-2">
+              <div class="card">
+                <div class="card-header">
+                  <span class="card-title">New Material Receipt</span>
+                  <span class="id-preview" id="mr-number-preview">Auto ID</span>
+                </div>
+                <div class="form-grid">
+                  <div class="form-group"><label>Receipt Date *</label><input type="date" id="mr-date" /></div>
+                  <div class="form-group full">
+                    <label>PO Reference *<span style="color:var(--ink3); font-size:.65rem; text-transform:none; letter-spacing:0"></span></label>
+                    <select id="mr-linked-pl" onchange="onMRPLReferenceChange()"><option value="">— None —</option></select>
+                  </div>
+                  <div class="form-group"><label>Location</label><input type="text" id="mr-location" class="readonly-field" readonly/></div>
+                  <div class="form-group"><label>Item</label><input type="text" id="mr-item" class="readonly-field" readonly/></div>
+
+                  <!-- ── SEARCHABLE ITEM COMBOBOX ── -->
+                  <!-- <div class="form-group full">
+                    <label>Item *</label>
+                    <div class="combobox-wrap" id="mr-item-combobox">
+                      <div class="combobox-input-wrap">
+                        <input
+                          type="text"
+                          class="combobox-input"
+                          id="mr-item-search"
+                          placeholder="Type to search items…"
+                          autocomplete="off"
+                          oninput="onComboboxSearch('mr')"
+                          onfocus="openComboboxDropdown('mr')"
+                        />
+                        <span class="combobox-chevron">▼</span>
+                      </div>
+                      <div class="combobox-dropdown" id="mr-item-dropdown"></div>
+                      <input type="hidden" id="mr-item" />
+                    </div>
+                  </div> -->
+
+                  <div class="form-group full"><label>Item Description</label><input type="text" id="mr-item-desc" class="readonly-field" readonly /></div>
+                  <div class="form-group"><label>Received From</label><input type="text" id="mr-from" placeholder="Vendor or donor name" class="readonly-field" readonly /></div>
+                  <!-- <div class="form-group">
+                    <label for="mrCondition">Overall Condition *</label>
+                    <select id="mr-condition" required>
+                      <option value="" disabled selected hidden>-- Select an option --</option>
+                      <option value="Good">Good</option>
+                      <option value="Damaged">Damaged</option>
+                      <option value="Short Delivery">Short Delivery</option>
+                    </select>
+                  </div> -->
+                  <!-- <div class="form-group"><label>Received Qty</label><input type="number" id="mr-received-qty" placeholder="0" oninput="calcMRRejected()" /></div> -->
+                  <div class="form-group"><label>Received Qty</label><input type="number" id="mr-received-qty" placeholder="0" class="readonly-field" readonly/></div>
+                  <!-- <div class="form-group"><label>Received By User</label><input type="number" id="mr-received-user" placeholder="0" /></div> -->
+                  <!-- <div class="form-group"><label>Accepted Qty *</label><input type="number" id="mr-accepted-qty" placeholder="0" oninput="calcMRRejected()" /></div> -->
+                  <!-- <div class="form-group"><label>Rejected Qty (Auto)</label><input type="text" id="mr-rejected-qty" class="readonly-field" readonly /></div> -->
+                  <!-- <div class="form-group full"><label>Rejection Reason <span style="color:var(--ink3); font-size:.65rem; text-transform:none; letter-spacing:0">(if any items rejected)</span></label><input type="text" id="mr-rejection-reason" placeholder="e.g. Damaged in transit" /></div> -->
+                  <div class="form-group full"><label>Bill / Invoice No.</label><input type="text" id="mr-bill-no" placeholder="e.g. BILL-001" /></div>
+                  <div class="form-group full"><label>Remarks</label><input type="text" id="mr-remarks" /></div>
+                </div>
+                <div class="form-actions">
+                  <button class="btn btn-primary" onclick="submitMR()" id="btn-add-mr">＋ Record Receipt</button>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-header">
+                  <span class="card-title">All Material Receipts</span>
+                  <span id="mr-count" class="badge badge-gray">0</span>
+                </div>
+                <div class="search-wrap">
+                  <div class="search-inner">
+                    <span class="search-icon-abs">🔍</span>
+                    <input type="text" placeholder="Search…" oninput="filterTable('mr-table', this.value)" />
+                  </div>
+                </div>
+                <div class="table-wrap" style="max-height:600px; overflow-y:auto;">
+                  <table id="mr-table">
+                    <thead><tr><th>MR No.</th><th>Date</th><th>Location</th><th>Item</th><th>Received</th>
+                      <!-- <th>Accepted</th><th>Rejected</th> -->
+                      <th>Condition</th><th>Linked PO</th><th>Bill No.</th></tr></thead>
+                    <tbody id="mr-tbody"><tr><td colspan="10"><div class="load-center"><div class="spinner"></div>Loading…</div></td></tr></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- ── INDENT PAGE ── -->
           <div class="page" id="page-indent">
             <div class="page-header">
@@ -1421,7 +1521,7 @@
     // ─────────────────────────────────────────────────────────
     // STATE
     // ─────────────────────────────────────────────────────────
-    let STATE = { items:[], catalogue:[], locations:[], prs:[], pls:[], indents:[], externalLink: null };
+    let STATE = { items:[], catalogue:[], locations:[], prs:[], pls:[], mrs:[], indents:[], availableItems:[], externalLink: null };
     let confirmCallback = null;
     let pendingApprovalPR = null;
     let pendingRejectPR   = null;
@@ -1596,15 +1696,30 @@
       } else if (prefix === 'indent') {
         document.getElementById('indent-item-desc').value = '';
         document.getElementById('indent-availability').classList.remove('show');
+      } else if (prefix === 'mr') {
+        document.getElementById('mr-item-desc').value = '';
       }
     }
 
     function renderComboboxDropdown(prefix, query) {
       const dropdown = document.getElementById(prefix + '-item-dropdown');
       const q = query.trim().toLowerCase();
-      const filtered = q
+      let filtered;
+      if (prefix === 'indent') {
+        // i.item_code + ' - ' + i.item_name
+        // const availableItems = STATE.availableItems.filter(i => i.location_id == v('indent-location'));
+        const availableItems = new Set(STATE.availableItems.filter(i => i.location_id == v('indent-location')).map(i => i.item_code + ' - ' + i.item_name));
+        // console.log('indent location available items ');
+        // console.log(itemComboOptions);
+        // console.log(availableItems);
+        filtered = q
+        ? itemComboOptions.filter(opt => opt.toLowerCase().includes(q)).filter(opt => availableItems.has(opt))
+        : itemComboOptions.filter(opt => availableItems.has(opt));
+      } else {
+        filtered = q
         ? itemComboOptions.filter(opt => opt.toLowerCase().includes(q))
         : itemComboOptions;
+      }
 
       if (!filtered.length) {
         dropdown.innerHTML = '<div class="combobox-empty">No items match</div>';
@@ -1627,6 +1742,7 @@
       if (prefix === 'pr') onPRItemChange();
       else if (prefix === 'pl') onPLItemChange();
       else if (prefix === 'indent') onIndentItemChange();
+      else if (prefix === 'mr') onMRItemChange();
     }
 
     function clearComboboxItem(prefix) {
@@ -1639,7 +1755,7 @@
 
     // Keyboard navigation for each combobox
     document.addEventListener('DOMContentLoaded', function() {
-      ['pr', 'pl', 'indent'].forEach(prefix => {
+      ['pr', 'pl', 'indent', 'mr'].forEach(prefix => {
         const searchInput = document.getElementById(prefix + '-item-search');
         if (!searchInput) return;
         searchInput.addEventListener('keydown', function(e) {
@@ -1713,7 +1829,7 @@
 
     // Close dropdown when clicking outside any of the comboboxes
     document.addEventListener('click', function(e) {
-      ['pr', 'pl', 'indent'].forEach(prefix => {
+      ['pr', 'pl', 'indent', 'mr'].forEach(prefix => {
         const wrap = document.getElementById(prefix + '-item-combobox');
         if (wrap && !wrap.contains(e.target)) {
           // If no item committed, revert text to committed value
@@ -1769,9 +1885,9 @@
       showToast('Error while fetching Purchase Requisitions: ' + error.message, 'error');
     }
 
-    async function getPurchaseLedgers() {
+    async function getPurchaseOrders() {
       const { data, error } = await supabaseClient
-        .from('purchase_ledgers_v')
+        .from('purchase_orders_v')
         .select();
       if (data) {
         return data;
@@ -1790,13 +1906,35 @@
       showToast('Error while fetching Indents: ' + error.message, 'error');
     }
 
+    async function getMaterialReceipts() {
+      const { data, error } = await supabaseClient
+        .from('material_receipts_v')
+        .select();
+      if (data) {
+        return data;
+      }
+      showToast('Error while fetching Material Receipts: ' + error.message, 'error');
+    }
+
+    async function getAvailableItems() {
+      const { data, error } = await supabaseClient
+        .from('available_items_v')
+        .select();
+      if (data) {
+        return data;
+      }
+      showToast('Error while fetching Material Receipts: ' + error.message, 'error');
+    }
+
     async function getInitData() {
       STATE.items = await getItems();
       STATE.catalogue = await getItemCategories();
       STATE.prs = await getPurchaseRequisitions();
       STATE.locations = await getLocations();
-      STATE.pls = await getPurchaseLedgers();
+      STATE.pls = await getPurchaseOrders();
+      STATE.mrs = await getMaterialReceipts();
       STATE.indents = await getIndents();
+      STATE.availableItems = await getAvailableItems();
       console.log(STATE);
     }
 
@@ -1837,9 +1975,7 @@
         // output.textContent = "Not logged in";
           supabaseClient.auth.signInWithOAuth({
           provider: "google"
-          // ,options: {
-          //   redirectTo: 'http://127.0.0.1:5500/shaishav', // Must be an absolute URL
-          // }
+          
         });
       }
     }
@@ -1888,10 +2024,6 @@
 
     function goToReportsPage() {
       window.location.href = "reports.html";
-      // google.script.run
-      //   .withSuccessHandler(openReportsPage)
-      //   .withFailureHandler(() => showToast('Failed to goto reports page', 'error'))
-      //   .getLink('Reports');
     }
 
     function openReportsPage(url) {
@@ -1901,7 +2033,7 @@
 
     function setDefaultDates() {
       const today = new Date().toISOString().split('T')[0];
-      ['pr-date','pr-date-req','pl-date','pl-billing-date','indent-date'].forEach(id => {
+      ['pr-date','pr-date-req','pl-date','pl-billing-date','indent-date','mr-date'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.value = today;
       });
@@ -1919,13 +2051,20 @@
         STATE.locations.forEach(l => sel.innerHTML += `<option value="${l.location_id}">${l.location_name}</option>`);
       });
 
-      // Item comboboxes (PR / PL / Indent) share the same option list
+      // Item comboboxes (PR / PL / Indent / MR) share the same option list
       buildItemComboOptions();
 
       const approvedPRs = STATE.prs.filter(p => p.status === 'Approved');
       const plPRSel = document.getElementById('pl-linked-pr');
       plPRSel.innerHTML = '<option value="">— None —</option>';
       approvedPRs.forEach(p => plPRSel.innerHTML += `<option value="${p.pr_number}">${p.pr_number} — ${p.item_name} @ ${p.location_name}</option>`);
+
+      // MR references a recorded Purchase Order / ledger entry (what was ordered/purchased)
+      const mrPLSel = document.getElementById('mr-linked-pl');
+      if (mrPLSel) {
+        mrPLSel.innerHTML = '<option value="">— None —</option>';
+        (STATE.pls || []).filter(p => p.mr_status != 'C').forEach(p => mrPLSel.innerHTML += `<option value="${p.pl_number}">${p.pl_number} — ${p.item} @ ${p.location_name}</option>`);
+      }
 
       // Populate "original indent" reference dropdown for Indent → Received flow
       const retRefSel = document.getElementById('indent-return-ref');
@@ -2097,6 +2236,46 @@
       avEl.className = 'avail-stat-value ' + (available > 5 ? 'avail-ok' : available > 0 ? 'avail-warn' : 'avail-zero');
 
       panel.classList.add('show');
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // MATERIAL RECEIPT (MR) — ITEM / REFERENCE CHANGE
+    // ─────────────────────────────────────────────────────────
+    function onMRItemChange() {
+      const code = comboCode(document.getElementById('mr-item').value);
+      console.log('mr code: ' + code);
+      const item = STATE.items.find(i => i.item_code === code);
+      document.getElementById('mr-item-desc').value = item ? item.item_description : '';
+    }
+
+    function onMRPLReferenceChange() {
+      const linkedPlNumber = v('mr-linked-pl');
+      if (linkedPlNumber.trim() === '') return;
+      const pls = STATE.pls;
+      const locations = STATE.locations;
+      const items = STATE.items;
+      const linkedPl = pls.find(p => p.pl_number === linkedPlNumber);
+      if (!linkedPl) return;
+      const location = locations.find(l => l.location_name === linkedPl.location_name);
+      if (location) document.getElementById('mr-location').value = location.location_name;
+
+      const item = items.find(i => i.item_name === linkedPl.item || (i.item_code + ' - ' + i.item_name) === linkedPl.item);
+      const comboVal = item ? (item.item_code + ' - ' + item.item_name) : (linkedPl.item || '');
+      document.getElementById('mr-item').value = comboVal;
+      // document.getElementById('mr-item-search').value = comboVal;
+      // if (comboVal) document.getElementById('mr-item-search').classList.add('has-value');
+
+      document.getElementById('mr-from').value = (linkedPl.source + ' - ' + linkedPl.order_issued_to )|| '';
+      document.getElementById('mr-received-qty').value = linkedPl.quantity || '';
+      // calcMRRejected();
+      onMRItemChange();
+    }
+
+    function calcMRRejected() {
+      const received = parseFloat(document.getElementById('mr-received-qty').value) || 0;
+      const accepted = parseFloat(document.getElementById('mr-accepted-qty').value) || 0;
+      const rejected = Math.max(received - accepted, 0);
+      document.getElementById('mr-rejected-qty').value = rejected;
     }
 
     // ─────────────────────────────────────────────────────────
@@ -2288,7 +2467,7 @@
       console.log(locationId, itemId);
 
       try {
-        const result = await callRpc('create_purchase_ledger_record', 
+        const result = await callRpc('create_purchase_order_record', 
           {
               p_date_received: v('pl-date'),
               p_location_id: locationId,
@@ -2318,6 +2497,54 @@
       } catch(err) {
         setLoading(btn, false); 
           showToast('Error: ' + err.message, 'error');
+      }
+    }
+
+    async function submitMR() {
+      if (!v('mr-date')||!v('mr-linked-pl')
+      // ||!v('mr-item')||!v('mr-from')||!v('mr-condition')||!v('mr-received-qty')||!v('mr-accepted-qty')
+    )
+        return showToast('Fill required fields', 'error');
+      const btn = document.getElementById('btn-add-mr');
+      setLoading(btn, true);
+
+      const plReferenceFullText = v('mr-linked-pl');
+      // console.log('plReferenceFullText: ' + plReferenceFullText);
+      const poNumber = plReferenceFullText.split(' ')[0];
+      const poId = STATE.pls.find(i => i.pl_number === poNumber).pl_id;
+      // console.log('po id: ' + poId);
+      // return;
+
+      // const locationId = v('mr-location');
+      // const items = STATE.items;
+      // const itemCode = comboCode(v('mr-item'));
+      // const itemId = items.filter(i => i.item_code === itemCode)[0].item_id;
+
+      try {
+        const result = await callRpc('create_material_receipt_record',
+          {
+              p_receipt_date: v('mr-date'),
+              p_ref_po_id: poId,
+              p_reference: v('mr-bill-no') ? v('mr-bill-no') : null,
+              p_remarks: v('mr-remarks') ? v('mr-remarks') : null
+          }
+        );
+        // console.log(result);
+        if (!result.responseData && !result.error) {
+          setLoading(btn, false);
+          showToast('Material Receipt recorded', 'success');
+          clearFields(['mr-received-qty','mr-bill-no','mr-remarks','mr-item-desc', 'mr-location', 'mr-item', 'mr-from']);
+          // clearComboboxItem('mr');
+          document.getElementById('mr-linked-pl').value = '';
+          refreshData();
+        }
+        else if (result.error) {
+          setLoading(btn, false);
+          showToast('Error: ' + result.error.message, 'error');
+        }
+      } catch(err) {
+        setLoading(btn, false);
+        showToast('Error: ' + err.message, 'error');
       }
     }
 
@@ -2406,17 +2633,6 @@
           showToast('Error: ' + err.message, 'error');
       }
 
-      // google.script.run
-      //   .withSuccessHandler(res => {
-          // setLoading(btn, false);
-          // showToast('Return recorded: ' + res.indentNo, 'success');
-          // clearFields(['indent-received-from','indent-recv-qty','indent-return-condition','indent-return-reason','indent-remarks','indent-item-desc']);
-          // clearComboboxItem('indent');
-          // document.getElementById('indent-return-ref').value = '';
-          // refreshData();
-      //   })
-      //   .withFailureHandler(err => { setLoading(btn, false); showToast('Error: ' + err.message, 'error'); })
-      //   .addIndent({ txnType:'receive', indentDate:v('indent-date'), location:v('indent-location'), item:v('indent-item'), originalIndentRef:v('indent-return-ref'), receivedQty:v('indent-recv-qty'), receivedFrom:v('indent-received-from'), returnCondition:v('indent-return-condition'), returnReason:v('indent-return-reason'), remarks:v('indent-remarks') });
     }
 
     // ─────────────────────────────────────────────────────────
@@ -2500,7 +2716,7 @@
     // RENDER
     // ─────────────────────────────────────────────────────────
     function renderAll() {
-      renderHome(); renderCatalogue(); renderItems(); renderPRs(); renderPLs(); renderIndents();
+      renderHome(); renderCatalogue(); renderItems(); renderPRs(); renderPLs(); renderMRs(); renderIndents();
     }
 
     function renderHome() {
@@ -2508,12 +2724,14 @@
       document.getElementById('hs-items').textContent   = STATE.items.length;
       document.getElementById('hs-prs').textContent     = STATE.prs.length;
       document.getElementById('hs-pls').textContent     = STATE.pls.length;
+      document.getElementById('hs-mrs').textContent     = (STATE.mrs||[]).length;
       document.getElementById('hs-indents').textContent = STATE.indents.length;
       document.getElementById('hs-cats').textContent    = STATE.catalogue.length;
       document.getElementById('hs-pending').textContent = pending;
       document.getElementById('hc-items').textContent   = STATE.items.length + ' items';
       document.getElementById('hc-prs').textContent     = STATE.prs.length + ' PRs';
       document.getElementById('hc-pls').textContent     = STATE.pls.length + ' entries';
+      document.getElementById('hc-mrs').textContent     = (STATE.mrs||[]).length + ' MRs';
       document.getElementById('hc-indents').textContent = STATE.indents.length + ' indents';
     }
 
@@ -2644,6 +2862,39 @@
       document.getElementById('pl-stats').innerHTML = `
         <div class="stat-card"><div class="stat-label">Total Entries</div><div class="stat-value">${pls.length}</div></div>
         <div class="stat-card"><div class="stat-label">Total Value</div><div class="stat-value">₹${total.toLocaleString('en-IN')}</div><div class="stat-sub">received</div></div>`;
+    }
+
+    function renderMRs() {
+      const tbody = document.getElementById('mr-tbody');
+      const mrs = STATE.mrs || [];
+      document.getElementById('mr-count').textContent = mrs.length;
+      const nums = mrs.map(m=>parseInt((m.mr_number||'').split('_').pop())||0);
+      document.getElementById('mr-number-preview').textContent = 'MR_'+String((nums.length?Math.max(...nums)+1:1)).padStart(5,'0');
+      if (!mrs.length) {
+        tbody.innerHTML = `<tr><td colspan="10"><div class="empty"><div class="empty-icon">📥</div><div class="empty-text">No material receipts yet</div></div></td></tr>`;
+        document.getElementById('mr-stats').innerHTML = ''; return;
+      }
+      const condBadge = (c) => {
+        const map = { Good:'badge-green', Damaged:'badge-red', 'Short Delivery':'badge-amber' };
+        return `<span class="badge ${map[c]||'badge-gray'}">${c||'—'}</span>`;
+      };
+      tbody.innerHTML = mrs.map(m=>`<tr>
+        <td><span class="badge badge-gray">${m.mr_number}</span></td>
+        <td>${m.receipt_date||'—'}</td><td>${m.location_name}</td>
+        <td style="max-width:130px; overflow:hidden; text-overflow:ellipsis;">${m.item}</td>
+        <td>${m.quantity||'—'}</td>
+        <td>${condBadge(m.condition)}</td>
+        <td>${m.po_number ? `<span class="badge badge-green">${m.po_number}</span>` : '—'}</td>
+        <td>${m.reference_number||'—'}</td>
+      </tr>`).join('');
+      const totalReceived = mrs.reduce((s,m)=>s+(Number(m.received_qty)||0),0);
+      const totalAccepted = mrs.reduce((s,m)=>s+(Number(m.accepted_qty)||0),0);
+      const totalRejected = mrs.reduce((s,m)=>s+(Number(m.rejected_qty)||0),0);
+      document.getElementById('mr-stats').innerHTML = `
+        <div class="stat-card"><div class="stat-label">Total Receipts</div><div class="stat-value">${mrs.length}</div></div>
+        <div class="stat-card"><div class="stat-label">Units Received</div><div class="stat-value">${totalReceived}</div></div>
+        <div class="stat-card"><div class="stat-label">Units Accepted</div><div class="stat-value">${totalAccepted}</div></div>
+        <div class="stat-card"><div class="stat-label">Units Rejected</div><div class="stat-value">${totalRejected}</div></div>`;
     }
 
     function renderIndents() {
