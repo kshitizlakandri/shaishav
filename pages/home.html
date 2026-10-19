@@ -1,0 +1,49 @@
+<!-- ── HOME PAGE ── -->
+<div class="page active" id="page-home">
+  <div id="home-greeting" class="home-greeting">
+    <div class="home-greeting-sub">Welcome back 👋</div>
+    <div class="home-greeting-title">Hello, <span id="greet-name">there</span></div>
+  </div>
+  <div class="home-stats">
+    <div class="home-stat"><div class="home-stat-label">Items</div><div class="home-stat-value" id="hs-items">—</div></div>
+    <div class="home-stat"><div class="home-stat-label">PRs Raised</div><div class="home-stat-value" id="hs-prs">—</div></div>
+    <div class="home-stat"><div class="home-stat-label">Ledger Entries</div><div class="home-stat-value" id="hs-pls">—</div></div>
+    <div class="home-stat"><div class="home-stat-label">Material Receipts</div><div class="home-stat-value" id="hs-mrs">—</div></div>
+    <div class="home-stat"><div class="home-stat-label">Indents</div><div class="home-stat-value" id="hs-indents">—</div></div>
+    <div class="home-stat"><div class="home-stat-label">Categories</div><div class="home-stat-value" id="hs-cats">—</div></div>
+    <div class="home-stat"><div class="home-stat-label">Pending PRs</div><div class="home-stat-value" id="hs-pending" style="color:var(--gold)">—</div></div>
+  </div>
+  <div class="home-menu-title">Modules</div>
+  <div class="home-grid">
+    <div class="home-card" style="--card-accent:var(--accent)" onclick="showPage('items')">
+      <div class="home-card-icon">📦</div>
+      <div class="home-card-title">Item Master</div>
+      <div class="home-card-desc">Manage items, categories and subcategories with auto-generated codes.</div>
+      <div class="home-card-count" id="hc-items">— items</div>
+    </div>
+    <div class="home-card" style="--card-accent:#92400e" onclick="showPage('pr')">
+      <div class="home-card-icon">📋</div>
+      <div class="home-card-title">Purchase Requisition</div>
+      <div class="home-card-desc">Raise purchase requests. Admins approve, reject, or mark fulfilled.</div>
+      <div class="home-card-count" id="hc-prs">— PRs</div>
+    </div>
+    <div class="home-card" style="--card-accent:var(--green)" onclick="showPage('pl')">
+      <div class="home-card-icon">🧾</div>
+      <div class="home-card-title">Purchase Order</div>
+      <div class="home-card-desc">Record received materials. Optionally link to an approved PR.</div>
+      <div class="home-card-count" style="background:rgba(27,122,78,.08); color:var(--green);" id="hc-pls">— entries</div>
+    </div>
+    <div class="home-card" style="--card-accent:var(--gold)" onclick="showPage('mr')">
+      <div class="home-card-icon">📥</div>
+      <div class="home-card-title">Material Receipt</div>
+      <div class="home-card-desc">Verify what actually arrived against a Purchase Order — accepted vs rejected quantities.</div>
+      <div class="home-card-count" style="background:rgba(201,168,76,.14); color:#92720f;" id="hc-mrs">— MRs</div>
+    </div>
+    <div class="home-card" style="--card-accent:var(--accent2)" onclick="showPage('indent')">
+      <div class="home-card-icon">📤</div>
+      <div class="home-card-title">Indent</div>
+      <div class="home-card-desc">Issue items from stock, or record returned items coming back in.</div>
+      <div class="home-card-count" style="background:rgba(232,65,30,.08); color:var(--accent2);" id="hc-indents">— indents</div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,94 @@
+<!-- ── PL PAGE ── -->
+<div class="page" id="page-pl">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Purchase Order</div>
+      <div class="page-subtitle">Record received materials and purchases</div>
+    </div>
+  </div>
+  <div class="stats-strip" id="pl-stats"></div>
+  <div class="split-2">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">New Entry</span>
+        <span class="id-preview" id="pl-number-preview">Auto ID</span>
+      </div>
+      <div class="form-grid">
+        <div class="form-group"><label>Date Received</label><input type="date" id="pl-date" /></div>
+        <div class="form-group full">
+          <label>PR Reference <span style="color:var(--ink3); font-size:.65rem; text-transform:none; letter-spacing:0">(optional)</span></label>
+          <select id="pl-linked-pr" onchange="onPLPRReferenceChange()"><option value="">— None —</option></select>
+        </div>
+        <div class="form-group"><label>Location *</label><select id="pl-location"><option value="">Select…</option></select></div>
+
+        <!-- ── SEARCHABLE ITEM COMBOBOX ── -->
+        <div class="form-group full">
+          <label>Item *</label>
+          <div class="combobox-wrap" id="pl-item-combobox">
+            <div class="combobox-input-wrap">
+              <input
+                type="text"
+                class="combobox-input"
+                id="pl-item-search"
+                placeholder="Type to search items…"
+                autocomplete="off"
+                oninput="onComboboxSearch('pl')"
+                onfocus="openComboboxDropdown('pl')"
+              />
+              <span class="combobox-chevron">▼</span>
+            </div>
+            <div class="combobox-dropdown" id="pl-item-dropdown"></div>
+            <input type="hidden" id="pl-item" />
+          </div>
+        </div>
+
+        <div class="form-group full"><label>Item Description</label><input type="text" id="pl-item-desc" class="readonly-field" readonly /></div>
+
+        <div class="form-group">
+          <label for="source">Source *</label>
+          <select name="source" id="pl-source" required>
+            <option value="" disabled selected hidden>Donation / Purchase</option>
+            <option value="Donation">Donation</option>
+            <option value="Purchase">Purchase</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="condition">Condition *</label>
+          <select name="condition" id="pl-condition" required>
+            <option value="" disabled selected hidden>New / Used</option>
+            <option value="New">New</option>
+            <option value="Used">Used</option>
+          </select>
+        </div>
+        <div class="form-group full"><label>Purchased / Received From *</label><input type="text" id="pl-from" placeholder="Vendor or donor name" /></div>
+        <div class="form-group"><label>Quantity *</label><input type="number" id="pl-qty" placeholder="0" oninput="calcTotal()" /></div>
+        <div class="form-group"><label>Price / Unit *</label><input type="number" id="pl-price" placeholder="0.00" oninput="calcTotal()" /></div>
+        <div class="form-group"><label>Total (Auto)</label><input type="text" id="pl-total" class="readonly-field" readonly /></div>
+        <div class="form-group"><label>Billing Date</label><input type="date" id="pl-billing-date" /></div>
+        <div class="form-group full"><label>Bill / Receipt / Indent No.</label><input type="text" id="pl-bill-no" placeholder="e.g. BILL-001" /></div>
+        <div class="form-group full"><label>Remarks</label><input type="text" id="pl-remarks" /></div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="submitPL()" id="btn-add-pl">＋ Add Entry</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">All Ledger Entries</span>
+        <span id="pl-count" class="badge badge-green">0</span>
+      </div>
+      <div class="search-wrap">
+        <div class="search-inner">
+          <span class="search-icon-abs">🔍</span>
+          <input type="text" placeholder="Search…" oninput="filterTable('pl-table', this.value)" />
+        </div>
+      </div>
+      <div class="table-wrap" style="max-height:600px; overflow-y:auto;">
+        <table id="pl-table">
+          <thead><tr><th>PL No.</th><th>Date</th><th>Location</th><th>Item</th><th>Source</th><th>Qty</th><th>Total</th><th>Bill No.</th><th>Linked PR</th></tr></thead>
+          <tbody id="pl-tbody"><tr><td colspan="9"><div class="load-center"><div class="spinner"></div>Loading…</div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

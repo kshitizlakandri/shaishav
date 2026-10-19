@@ -1,0 +1,103 @@
+<!-- ── ITEMS + CATEGORY MASTER PAGE (merged) ── -->
+<div class="page" id="page-items">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Item Master</div>
+      <div class="page-subtitle">Add items, plus their categories and subcategories, from one place</div>
+    </div>
+  </div>
+  <div class="stats-strip" id="items-stats"></div>
+  <div class="split-equal">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Add New Item</span>
+        <span class="id-preview" id="item-code-preview">Auto ID</span>
+      </div>
+      <div class="form-grid">
+        <div class="form-group"><label>Item Name *</label><input type="text" id="item-name" placeholder="e.g. Pencil" /></div>
+
+        <!-- ── SEARCHABLE CATEGORY COMBOBOX (creatable) ── -->
+        <div class="form-group">
+          <label>Category *</label>
+          <div class="combobox-wrap" id="cat-category-combobox">
+            <div class="combobox-input-wrap">
+              <input
+                type="text"
+                class="combobox-input"
+                id="cat-category-search"
+                placeholder="Type to search or add category…"
+                autocomplete="off"
+                oninput="onCatComboSearch('category')"
+                onfocus="openCatCombobox('category')"
+              />
+              <span class="combobox-chevron">▼</span>
+            </div>
+            <div class="combobox-dropdown" id="cat-category-dropdown"></div>
+            <input type="hidden" id="item-category" onchange="onCategoryChange()" />
+          </div>
+        </div>
+
+        <!-- ── SEARCHABLE SUBCATEGORY COMBOBOX (creatable) ── -->
+        <div class="form-group">
+          <label>Subcategory *</label>
+          <div class="combobox-wrap" id="cat-subcategory-combobox">
+            <div class="combobox-input-wrap">
+              <input
+                type="text"
+                class="combobox-input"
+                id="cat-subcategory-search"
+                placeholder="Select a category first…"
+                autocomplete="off"
+                oninput="onCatComboSearch('subcategory')"
+                onfocus="openCatCombobox('subcategory')"
+              />
+              <span class="combobox-chevron">▼</span>
+            </div>
+            <div class="combobox-dropdown" id="cat-subcategory-dropdown"></div>
+            <input type="hidden" id="item-subcategory" onchange="updateItemCodePreview()" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="itemType">Item Type *</label>
+          <select name="itemType" id="item-type" required>
+            <option value="" disabled selected hidden>Consumable / Resuable</option>
+            <option value="Consumable">Consumable</option>
+            <option value="Resusable">Resusable</option>
+          </select>
+        </div>
+        <div class="form-group full"><label>Description</label><textarea id="item-desc" placeholder="Brief description…"></textarea></div>
+        <div class="form-group full"><label>Remarks</label><input type="text" id="item-remarks" placeholder="Any remarks…" /></div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="submitItem()" id="btn-add-item">＋ Add Item</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title" id="items-list-title">All Items</span>
+        <span id="items-count" class="badge badge-blue">0</span>
+      </div>
+      <div class="subtab-row" style="padding:.85rem 1rem 0;">
+        <button class="subtab-btn active" id="items-subtab-items" onclick="setItemsSubtab('items')">Items</button>
+        <button class="subtab-btn" id="items-subtab-categories" onclick="setItemsSubtab('categories')">Categories</button>
+      </div>
+      <div class="search-wrap">
+        <div class="search-inner">
+          <span class="search-icon-abs">🔍</span>
+          <input type="text" id="items-list-search" placeholder="Search items…" oninput="filterTable(currentItemsSubtab==='items' ? 'items-table' : 'cat-table', this.value)" />
+        </div>
+      </div>
+      <div class="table-wrap" style="max-height:480px; overflow-y:auto;">
+        <table id="items-table">
+          <thead><tr><th>Code</th><th>Name</th><th>Category</th><th>Subcategory</th><th>Description</th></tr></thead>
+          <tbody id="items-tbody"><tr><td colspan="5"><div class="load-center"><div class="spinner"></div>Loading…</div></td></tr></tbody>
+        </table>
+        <table id="cat-table" style="display:none;">
+          <thead><tr><th>Category</th><th>Subcategory</th><th>Code</th><th></th></tr></thead>
+          <tbody id="cat-tbody"><tr><td colspan="4"><div class="load-center"><div class="spinner"></div>Loading…</div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
