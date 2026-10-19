@@ -29,10 +29,10 @@ async function checkUser() {
     }
   } else {
     supabaseClient.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: 'http://127.0.0.1:5500', // Must be an absolute URL
-      }
+      provider: "google"
+      // ,options: {
+      //   redirectTo: 'http://127.0.0.1:5500', // Must be an absolute URL
+      // }
     });
   }
 }
