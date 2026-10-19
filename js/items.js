@@ -120,7 +120,10 @@ async function renderItems() {
     tbody.innerHTML = items.map(i => `
       <tr>
         <td><span class="badge badge-blue">${i.item_code}</span></td>
-        <td><strong>${i.item_name}</strong></td><td>${i.category}</td><td>${i.subcategory}</td>
+        <td><strong>${i.item_name}</strong></td>
+        <td>${i.category}</td>
+        <td>${i.subcategory}</td>
+        <td>${i.item_type}</td>
         <td style="color:var(--ink3); max-width:180px; overflow:hidden; text-overflow:ellipsis;">${i.item_description||'—'}</td>
       </tr>`).join('');
   }

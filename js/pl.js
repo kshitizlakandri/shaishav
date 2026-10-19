@@ -69,7 +69,7 @@ async function submitPL() {
     console.log(result);
     if (!result.responseData && !result.error) {
       setLoading(btn, false);
-      showToast('PL Added', 'success');
+      showToast('PO Added', 'success');
       refreshData();
       populateDropdowns();
     }
@@ -88,7 +88,7 @@ function renderPLs() {
   const pls = STATE.pls;
   document.getElementById('pl-count').textContent = pls.length;
   const nums = pls.map(p=>parseInt(p.pl_number.split('_').pop())||0);
-  document.getElementById('pl-number-preview').textContent = 'PL_'+String((nums.length?Math.max(...nums)+1:1)).padStart(5,'0');
+  document.getElementById('pl-number-preview').textContent = 'PO_'+String((nums.length?Math.max(...nums)+1:1)).padStart(5,'0');
   if (!pls.length) {
     tbody.innerHTML = `<tr><td colspan="9"><div class="empty"><div class="empty-icon">🧾</div><div class="empty-text">No ledger entries yet</div></div></td></tr>`;
     document.getElementById('pl-stats').innerHTML = ''; return;

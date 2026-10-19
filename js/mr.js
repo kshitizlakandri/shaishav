@@ -22,7 +22,7 @@ function onMRPLReferenceChange() {
   const item = items.find(i => i.item_name === linkedPl.item || (i.item_code + ' - ' + i.item_name) === linkedPl.item);
   const comboVal = item ? (item.item_code + ' - ' + item.item_name) : (linkedPl.item || '');
   document.getElementById('mr-item').value = comboVal;
-
+  document.getElementById('mr-item-type').value = item.item_type;
   document.getElementById('mr-from').value = (linkedPl.source + ' - ' + linkedPl.order_issued_to )|| '';
   document.getElementById('mr-received-qty').value = linkedPl.quantity || '';
   onMRItemChange();
