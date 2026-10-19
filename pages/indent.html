@@ -1,0 +1,124 @@
+<!-- ── INDENT PAGE ── -->
+<div class="page" id="page-indent">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Indent</div>
+      <div class="page-subtitle">Issue items from stock, or record a returned item coming back in</div>
+    </div>
+  </div>
+  <div class="stats-strip" id="indent-stats"></div>
+  <div class="split-2">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">New Transaction</span>
+        <span class="id-preview" id="indent-number-preview">Auto ID</span>
+      </div>
+
+      <!-- ── ISSUE / RECEIVE TOGGLE ── -->
+      <div class="txn-toggle">
+        <button type="button" class="txn-toggle-btn active" data-txn="issue" id="indent-txn-issue-btn" onclick="setIndentTxnType('issue')">📤 Issued</button>
+        <button type="button" class="txn-toggle-btn" data-txn="receive" id="indent-txn-receive-btn" onclick="setIndentTxnType('receive')">📥 Received</button>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group"><label>Indent Date *</label><input type="date" id="indent-date" /></div>
+        <div class="form-group full indent-receive-field" style="display:none;">
+          <label>Original Indent Ref. *</label>
+          <select id="indent-return-ref" onchange="onIndentReceiveRefChange()"><option value="">— None —</option></select>
+        </div>
+        <div class="form-group"><label>Location *</label><select id="indent-location" onchange="onIndentLocationChange()"><option value="">Select…</option></select></div>
+
+        <!-- ── SEARCHABLE ITEM COMBOBOX ── -->
+        <div class="form-group full">
+          <label>Item *</label>
+          <div class="combobox-wrap" id="indent-item-combobox">
+            <div class="combobox-input-wrap">
+              <input
+                type="text"
+                class="combobox-input"
+                id="indent-item-search"
+                placeholder="Type to search items…"
+                autocomplete="off"
+                oninput="onComboboxSearch('indent')"
+                onfocus="openComboboxDropdown('indent')"
+              />
+              <span class="combobox-chevron">▼</span>
+            </div>
+            <div class="combobox-dropdown" id="indent-item-dropdown"></div>
+            <input type="hidden" id="indent-item" />
+          </div>
+        </div>
+      </div>
+
+      <div class="availability-panel" id="indent-availability">
+        <div class="avail-header">📊 Stock at selected location</div>
+        <div class="avail-body">
+          <div class="avail-stat"><div class="avail-stat-label">Received</div><div class="avail-stat-value" id="indent-avail-received">—</div></div>
+          <div class="avail-stat"><div class="avail-stat-label">Issued</div><div class="avail-stat-value" id="indent-avail-issued">—</div></div>
+          <div class="avail-stat"><div class="avail-stat-label">Available</div><div class="avail-stat-value" id="indent-avail-available">—</div></div>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group full"><label>Item Description</label><input type="text" id="indent-item-desc" class="readonly-field" readonly /></div>
+
+        <!-- ── ISSUE-ONLY FIELDS ── -->
+        <div class="form-group full indent-issue-field"><label>Requested By</label><input type="text" id="indent-requested-by" placeholder="Name of requester" readonly/></div>
+        <div class="form-group indent-issue-field"><label>Requested Qty *</label><input type="number" id="indent-req-qty" placeholder="0" /></div>
+        <div class="form-group indent-issue-field"><label>Issued Qty *</label><input type="number" id="indent-iss-qty" placeholder="0" /></div>
+        <div class="form-group indent-issue-field"><label>Issued To *</label><input type="text" id="indent-issued-to" /></div>
+        <div class="form-group indent-issue-field">
+          <label for="usedAtAs">Used At / As</label>
+          <select name="usedAtAs" id="indent-used-at">
+            <option value="" disabled selected hidden>-- Select an option --</option>
+            <option value="School">School</option>
+            <option value="Personal">Personal</option>
+            <option value="Official">Official</option>
+            <option value="Gift to Children">Gift to Children</option>
+            <option value="Lost">Lost</option>
+            <option value="Gift to Visitor">Gift to Visitor</option>
+          </select>
+        </div>
+        <div class="form-group full indent-issue-field"><label>Purpose of Use</label><input type="text" id="indent-purpose" /></div>
+
+        <!-- ── RECEIVE-ONLY FIELDS ── -->
+        <div class="form-group indent-receive-field" style="display:none;"><label>Consumed Qty *</label><input type="number" id="indent-consumed-qty" placeholder="0" /></div>
+        <div class="form-group indent-receive-field" style="display:none;"><label>Received Qty *</label><input type="number" id="indent-recv-qty" placeholder="0" /></div>
+        <div class="form-group indent-receive-field" style="display:none;"><label>Received From</label><input type="text" id="indent-received-from" placeholder="Name returning the item" /></div>
+        <div class="form-group indent-receive-field" style="display:none;">
+          <label>Condition on Return</label>
+          <select id="indent-return-condition">
+            <option value="" disabled selected hidden>-- Select an option --</option>
+            <option value="Good">Good</option>
+            <option value="Damaged">Damaged</option>
+            <option value="Not Usable">Not Usable</option>
+          </select>
+        </div>
+        <div class="form-group full indent-receive-field" style="display:none;"><label>Reason for Return</label><input type="text" id="indent-return-reason" /></div>
+
+        <div class="form-group full"><label>Remarks</label><input type="text" id="indent-remarks" /></div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="submitIndent()" id="btn-add-indent">＋ Submit</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">All Indents</span>
+        <span id="indent-count" class="badge badge-red">0</span>
+      </div>
+      <div class="search-wrap">
+        <div class="search-inner">
+          <span class="search-icon-abs">🔍</span>
+          <input type="text" placeholder="Search…" oninput="filterTable('indent-table', this.value)" />
+        </div>
+      </div>
+      <div class="table-wrap" style="max-height:600px; overflow-y:auto;">
+        <table id="indent-table">
+          <thead><tr><th>Indent No.</th><th>Type</th><th>Date</th><th>Location</th><th>Requested By</th><th>Issued to / Received From</th><th>Item</th><th>Req. Qty</th><th>Consumed Qty</th><th>Issued/Recv Qty</th><th>Purpose</th></tr></thead>
+          <tbody id="indent-tbody"><tr><td colspan="10"><div class="load-center"><div class="spinner"></div>Loading…</div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

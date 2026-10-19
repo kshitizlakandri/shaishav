@@ -1,0 +1,100 @@
+<!-- ── PR PAGE ── -->
+<div class="page" id="page-pr">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Purchase Requisition</div>
+      <div class="page-subtitle">Raise and track purchase requests</div>
+    </div>
+  </div>
+  <div class="stats-strip" id="pr-stats"></div>
+  <div class="split-2">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">New PR</span>
+        <span class="id-preview" id="pr-number-preview">Auto ID</span>
+      </div>
+      <div class="form-grid">
+        <div class="form-group"><label>PR Date *</label><input type="date" id="pr-date" readonly></div>
+        <div class="form-group">
+          <label>Location *</label><select id="pr-location" onchange="onPRLocationChange()"><option value="">Select…</option></select>
+        </div>
+
+        <!-- ── SEARCHABLE ITEM COMBOBOX ── -->
+        <div class="form-group full">
+          <label>Item *</label>
+          <div class="combobox-wrap" id="pr-item-combobox">
+            <div class="combobox-input-wrap">
+              <input
+                type="text"
+                class="combobox-input"
+                id="pr-item-search"
+                placeholder="Type to search items…"
+                autocomplete="off"
+                oninput="onComboboxSearch('pr')"
+                onfocus="openComboboxDropdown('pr')"
+              />
+              <span class="combobox-chevron">▼</span>
+            </div>
+            <div class="combobox-dropdown" id="pr-item-dropdown"></div>
+            <!-- hidden field carries the actual value -->
+            <input type="hidden" id="pr-item" />
+          </div>
+        </div>
+      </div>
+
+      <div class="availability-panel" id="pr-availability">
+        <div class="avail-header">📊 Stock at selected location</div>
+        <div class="avail-body">
+          <div class="avail-stat"><div class="avail-stat-label">Received</div><div class="avail-stat-value" id="pr-avail-received">—</div></div>
+          <div class="avail-stat"><div class="avail-stat-label">Issued</div><div class="avail-stat-value" id="pr-avail-issued">—</div></div>
+          <div class="avail-stat"><div class="avail-stat-label">Available</div><div class="avail-stat-value" id="pr-avail-available">—</div></div>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group full"><label>Item Description</label><input type="text" id="pr-item-desc" class="readonly-field" readonly /></div>
+        <div class="form-group"><label>Quantity *</label><input type="number" id="pr-qty" placeholder="0" oninput="calcBudget()" /></div>
+        <div class="form-group"><label>Price / Unit</label><input type="number" id="pr-price" placeholder="0.00" oninput="calcBudget()" /></div>
+        <div class="form-group"><label>Budget (Auto)</label><input type="text" id="pr-budget" class="readonly-field" readonly /></div>
+        <div class="form-group"><label>Date Required *</label><input type="date" id="pr-date-req" /></div>
+        <div class="form-group full"><label>Purpose</label><input type="text" id="pr-purpose" placeholder="e.g. Balsena Project" /></div>
+        <div class="form-group full"><label>Remarks</label><input type="text" id="pr-remarks" /></div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="submitPR()" id="btn-add-pr">＋ Submit PR</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">All Purchase Requisitions</span>
+        <span id="pr-count" class="badge badge-amber">0</span>
+      </div>
+      <div class="filter-tabs" id="pr-filter-tabs">
+        <button class="filter-tab active" onclick="setPRFilter('All', this)">All</button>
+        <button class="filter-tab" onclick="setPRFilter('Pending', this)">Pending</button>
+        <button class="filter-tab" onclick="setPRFilter('Approved', this)">Approved</button>
+        <button class="filter-tab" onclick="setPRFilter('Rejected', this)">Rejected</button>
+        <button class="filter-tab" onclick="setPRFilter('Fulfilled', this)">Fulfilled</button>
+      </div>
+      <div class="search-wrap" style="padding-top:.35rem;">
+        <div class="search-inner">
+          <span class="search-icon-abs">🔍</span>
+          <input type="text" placeholder="Search PRs…" oninput="filterPRTable(this.value)" />
+        </div>
+      </div>
+      <div class="table-wrap" style="max-height:560px; overflow-y:auto;">
+        <table id="pr-table">
+          <thead>
+            <tr>
+              <th>PR No.</th><th>Date</th><th>Location</th><th>Item</th>
+              <th>Qty</th><th>Budget</th><th>Status</th>
+              <th>Requested By</th><th>Approved By</th><th>Linked PL</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="pr-tbody"><tr><td colspan="10"><div class="load-center"><div class="spinner"></div>Loading…</div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,54 @@
+<!-- ── MATERIAL RECEIPT (MR) PAGE ── -->
+<div class="page" id="page-mr">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Material Receipt</div>
+      <div class="page-subtitle">Verify quantity and condition of materials as they physically arrive against a Purchase Order</div>
+    </div>
+  </div>
+  <div class="stats-strip" id="mr-stats"></div>
+  <div class="split-2">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">New Material Receipt</span>
+        <span class="id-preview" id="mr-number-preview">Auto ID</span>
+      </div>
+      <div class="form-grid">
+        <div class="form-group"><label>Receipt Date *</label><input type="date" id="mr-date" /></div>
+        <div class="form-group full">
+          <label>PO Reference *<span style="color:var(--ink3); font-size:.65rem; text-transform:none; letter-spacing:0"></span></label>
+          <select id="mr-linked-pl" onchange="onMRPLReferenceChange()"><option value="">— None —</option></select>
+        </div>
+        <div class="form-group"><label>Location</label><input type="text" id="mr-location" class="readonly-field" readonly/></div>
+        <div class="form-group"><label>Item</label><input type="text" id="mr-item" class="readonly-field" readonly/></div>
+
+        <div class="form-group full"><label>Item Description</label><input type="text" id="mr-item-desc" class="readonly-field" readonly /></div>
+        <div class="form-group"><label>Received From</label><input type="text" id="mr-from" placeholder="Vendor or donor name" class="readonly-field" readonly /></div>
+        <div class="form-group"><label>Received Qty</label><input type="number" id="mr-received-qty" placeholder="0" class="readonly-field" readonly/></div>
+        <div class="form-group full"><label>Bill / Invoice No.</label><input type="text" id="mr-bill-no" placeholder="e.g. BILL-001" /></div>
+        <div class="form-group full"><label>Remarks</label><input type="text" id="mr-remarks" /></div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="submitMR()" id="btn-add-mr">＋ Record Receipt</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">All Material Receipts</span>
+        <span id="mr-count" class="badge badge-gray">0</span>
+      </div>
+      <div class="search-wrap">
+        <div class="search-inner">
+          <span class="search-icon-abs">🔍</span>
+          <input type="text" placeholder="Search…" oninput="filterTable('mr-table', this.value)" />
+        </div>
+      </div>
+      <div class="table-wrap" style="max-height:600px; overflow-y:auto;">
+        <table id="mr-table">
+          <thead><tr><th>MR No.</th><th>Date</th><th>Location</th><th>Item</th><th>Received</th><th>Condition</th><th>Linked PO</th><th>Bill No.</th></tr></thead>
+          <tbody id="mr-tbody"><tr><td colspan="10"><div class="load-center"><div class="spinner"></div>Loading…</div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
