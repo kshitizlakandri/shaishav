@@ -5,10 +5,7 @@ let indentTxnType = 'issue';
 
 function onIndentReceiveRefChange() {
   const indentReturnRef = v('indent-return-ref').split(":", 1)[0];
-  console.log(indentReturnRef);
-  console.log(STATE.indents);
   const indent = STATE.indents.find(i => i.indent_number === indentReturnRef);
-  console.log(indent);
   const locationId = STATE.locations.find(l => l.location_name == indent.location_name).location_id;
   document.getElementById('indent-location').value = locationId;
   document.getElementById('indent-item').value = indent.item;
@@ -17,7 +14,9 @@ function onIndentReceiveRefChange() {
 }
 
 function onIndentLocationChange() {
+  document.getElementById('indent-item').value = '';
   updateIndentAvailability();
+  toggleAsset();
 }
 
 function onIndentItemChange() {
@@ -25,6 +24,39 @@ function onIndentItemChange() {
   const item = STATE.items.find(i => i.item_code === code);
   document.getElementById('indent-item-desc').value = item ? item.item_description : '';
   updateIndentAvailability();
+  toggleAsset();
+}
+
+async function toggleAsset() {
+  const code = comboCode(document.getElementById('indent-item').value);
+  const item = STATE.items.find(i => i.item_code === code);
+  const assetNumberField = document.getElementById('indent-asset-number');
+  if (item === undefined) {
+    document.querySelectorAll('.asset-number-label').forEach(el => el.style.display = 'none');
+    assetNumberField.value = null;
+    return;
+  }
+  const issueQty = document.getElementById('indent-iss-qty');
+  if (item.item_type.toUpperCase() == 'ASSET') {
+    const locationId = document.getElementById('indent-location').value;
+    console.log(item.item_id);
+    console.log(locationId);
+    const response = await await supabaseClient.rpc('get_available_asset',
+      {
+        p_item_id: Number(item.item_id),
+        p_location_id: Number(locationId)
+      });
+    console.log(response);
+    issueQty.value = 1;
+    issueQty.disabled = true;
+    document.querySelectorAll('.asset-number-label').forEach(el => el.style.display = '');
+    assetNumberField.value = response.data.asset_number;
+  } else {
+    issueQty.value = 0;
+    issueQty.disabled = false;
+    document.querySelectorAll('.asset-number-label').forEach(el => el.style.display = 'none');
+    assetNumberField.value = null;
+  }
 }
 
 async function updateIndentAvailability() {
@@ -67,14 +99,14 @@ function setIndentTxnType(type) {
   document.querySelectorAll('.indent-receive-field').forEach(el => el.style.display = type === 'receive' ? '' : 'none');
   document.getElementById('btn-add-indent').textContent = type === 'issue' ? '＋ Submit Issue' : '＋ Submit Return';
   if (type === 'issue') {
-    document.getElementById('indent-req-qty').setAttribute('required','');
+    // document.getElementById('indent-req-qty').setAttribute('required','');
     document.getElementById('indent-location').disabled = false;
     document.getElementById('indent-item-search').disabled = false;
     document.getElementById('indent-received-from').disabled = false;
   } else {
     const panel = document.getElementById('indent-availability');
     panel.classList.remove('show');
-    document.getElementById('indent-req-qty').removeAttribute('required');
+    // document.getElementById('indent-req-qty').removeAttribute('required');
     document.getElementById('indent-location').disabled = true;
     document.getElementById('indent-item-search').disabled = true;
     document.getElementById('indent-received-from').disabled = true;
@@ -92,7 +124,7 @@ function submitIndent() {
 }
 
 async function submitIndentIssue() {
-  if (!v('indent-date')||!v('indent-location')||!v('indent-item')||!v('indent-req-qty')||!v('indent-iss-qty')||!v('indent-issued-to'))
+  if (!v('indent-date')||!v('indent-location')||!v('indent-item')||!v('indent-iss-qty')||!v('indent-issued-to'))
     return showToast('Fill required fields', 'error');
   const btn = document.getElementById('btn-add-indent');
   setLoading(btn, true);
@@ -104,7 +136,7 @@ async function submitIndentIssue() {
         p_indent_date: v('indent-date'),
         p_location_id: parseInt(v('indent-location')),
         p_item_id: itemId,
-        p_requested_qty: v('indent-req-qty'),
+        p_requested_qty: null,
         p_issued_qty: v('indent-iss-qty'),
         p_issued_to: v('indent-issued-to'),
         p_used_at_as: v('indent-used-at'),
@@ -112,11 +144,10 @@ async function submitIndentIssue() {
         p_remarks: v('indent-remarks')
       }
     );
-    console.log(result);
     if (!result.responseData && !result.error) {
       setLoading(btn, false);
       showToast('Indent submitted', 'success');
-      clearFields(['indent-requested-by','indent-req-qty','indent-iss-qty','indent-issued-to','indent-used-at','indent-purpose','indent-consumed-qty','indent-remarks','indent-item-desc']);
+      clearFields(['indent-issued-by','indent-iss-qty','indent-issued-to','indent-used-at','indent-purpose','indent-consumed-qty','indent-remarks','indent-item-desc']);
       clearComboboxItem('indent');
       refreshData();
       populateDropdowns();
@@ -137,9 +168,7 @@ async function submitIndentReceive() {
   const btn = document.getElementById('btn-add-indent');
   setLoading(btn, true);
   const indentNumber = v('indent-return-ref').split(":", 1)[0];
-  console.log(indentNumber);
   const indentId = STATE.indents.find(i => i.indent_number === indentNumber).indent_id;
-  console.log(indentId);
 
   try {
     const result = await callRpc('create_indent_received_record',
@@ -153,7 +182,6 @@ async function submitIndentReceive() {
         p_remarks: v('indent-remarks') ? v('indent-remarks') : null
       }
     );
-    console.log(result);
     if (!result.responseData && !result.error) {
       setLoading(btn, false);
       showToast('Return recorded', 'success');
@@ -173,7 +201,8 @@ async function submitIndentReceive() {
 }
 
 function renderIndents() {
-  document.getElementById('indent-requested-by').value = currentUser.username;
+  toggleAsset();
+  document.getElementById('indent-issued-by').value = currentUser.username;
   const tbody = document.getElementById('indent-tbody');
   const indents = STATE.indents;
   document.getElementById('indent-count').textContent = indents.length;

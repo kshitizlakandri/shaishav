@@ -54,6 +54,6 @@ function closeModal(id) { document.getElementById(id).classList.remove('show'); 
 
 async function callRpc(procName, data) {
   const { responseData , error } = await supabaseClient.rpc(procName, data);
-  console.log(responseData);
+  // console.log(responseData);
   return { responseData , error };
 }
