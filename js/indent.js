@@ -11,6 +11,7 @@ function onIndentReceiveRefChange() {
   document.getElementById('indent-item').value = indent.item;
   document.getElementById('indent-item-desc').value = indent.item_description;
   document.getElementById('indent-received-from').value = indent.issued_to;
+  toggleAsset();
 }
 
 function onIndentLocationChange() {
@@ -30,8 +31,9 @@ function onIndentItemChange() {
 async function toggleAsset() {
   const code = comboCode(document.getElementById('indent-item').value);
   const item = STATE.items.find(i => i.item_code === code);
+  const refIndent = STATE.indents.find(i => i.indent_number === v('indent-return-ref').split(":", 1)[0]);
   const assetNumberField = document.getElementById('indent-asset-number');
-  if (item === undefined) {
+  if ((item === undefined && indentTxnType === 'issue') || (refIndent === undefined && indentTxnType !== 'issue')) {
     document.querySelectorAll('.asset-number-label').forEach(el => el.style.display = 'none');
     assetNumberField.value = null;
     return;
@@ -39,14 +41,19 @@ async function toggleAsset() {
   const issueQty = document.getElementById('indent-iss-qty');
   if (item.item_type.toUpperCase() == 'ASSET') {
     const locationId = document.getElementById('indent-location').value;
-    console.log(item.item_id);
-    console.log(locationId);
-    const response = await await supabaseClient.rpc('get_available_asset',
-      {
-        p_item_id: Number(item.item_id),
-        p_location_id: Number(locationId)
-      });
-    console.log(response);
+    let response;
+    if (indentTxnType === 'issue') {
+      response = await supabaseClient.rpc('get_available_asset',
+        {
+          p_item_id: Number(item.item_id),
+          p_location_id: Number(locationId)
+        });
+    } else {
+      response = await supabaseClient.rpc('get_asset_from_indent',
+        {
+          p_indent_id: Number(refIndent.indent_id)
+        });
+    }
     issueQty.value = 1;
     issueQty.disabled = true;
     document.querySelectorAll('.asset-number-label').forEach(el => el.style.display = '');
@@ -114,8 +121,9 @@ function setIndentTxnType(type) {
     document.getElementById('indent-item-desc').value = "";
     document.getElementById('indent-location').value = "";
     document.getElementById('indent-availability').removeAttribute('show');
-    populateDropdowns(); // refresh the "original indent" reference list
   }
+  populateDropdowns(); // refresh the "original indent" reference list
+  toggleAsset()
 }
 
 function submitIndent() {
@@ -167,8 +175,7 @@ async function submitIndentReceive() {
     return showToast('Fill required fields', 'error');
   const btn = document.getElementById('btn-add-indent');
   setLoading(btn, true);
-  const indentNumber = v('indent-return-ref').split(":", 1)[0];
-  const indentId = STATE.indents.find(i => i.indent_number === indentNumber).indent_id;
+  const indentId = STATE.indents.find(i => i.indent_number === v('indent-return-ref').split(":", 1)[0]).indent_id;
 
   try {
     const result = await callRpc('create_indent_received_record',
@@ -223,6 +230,7 @@ function renderIndents() {
     <td>${i.location_name}</td>
     <td>${i.requested_by||'—'}</td>
     <td>${i.issued_to||i.received_from}</td>
+    <td>${i.asset_number||'—'}</td>
     <td style="max-width:130px; overflow:hidden; text-overflow:ellipsis;">${i.item}</td>
     <td>${i.requested_qty||'—'}</td>
     <td>${i.consumed_qty||'—'}</td>

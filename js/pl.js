@@ -4,6 +4,8 @@
 function onPLPRReferenceChange() {
   const linkedPrNumber = v('pl-linked-pr');
   if (linkedPrNumber.trim() === '') {
+    document.getElementById('pl-item-search').disabled = false;
+    document.getElementById('pl-location').disabled = false;
     return;
   }
   const prs = STATE.prs;
@@ -24,6 +26,9 @@ function onPLPRReferenceChange() {
   document.getElementById('pl-price').value = linkedPr.budget / linkedPr.pr_qty;
   calcTotal();
   onPLItemChange();
+
+  document.getElementById('pl-item-search').disabled = true;
+  document.getElementById('pl-location').disabled = true;
 }
 
 function onPLItemChange() {
