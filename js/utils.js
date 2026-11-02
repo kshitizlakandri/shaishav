@@ -57,3 +57,28 @@ async function callRpc(procName, data) {
   // console.log(responseData);
   return { responseData , error };
 }
+
+// ─────────────────────────────────────────────────────────
+// ACCESS CONTROL (UI side — the database must enforce the same rules)
+// ─────────────────────────────────────────────────────────
+// can('pr:approve')            -> true if the user has that permission
+// can('indent:issue|indent:receive') -> true if the user has ANY of them
+// A '*' permission grants everything.
+function can(perm) {
+  const set = currentUser && currentUser.permissions;
+  if (!set) return false;
+  if (set.has('*')) return true;
+  return String(perm).split('|').some(p => set.has(p.trim()));
+}
+
+// Hides every element carrying data-perm that the user isn't allowed to see.
+function applyAccessControl() {
+  document.querySelectorAll('[data-perm]').forEach(el => {
+    el.hidden = !can(el.dataset.perm);
+  });
+  // If a split layout lost a card (e.g. no create permission), let the other one use the full width
+  document.querySelectorAll('.split-2, .split-equal').forEach(grid => {
+    const anyHidden = [...grid.children].some(c => c.hidden);
+    grid.classList.toggle('single-col', anyHidden);
+  });
+}

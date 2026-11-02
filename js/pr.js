@@ -178,7 +178,8 @@ function renderPRs() {
   if (prFilter !== 'All') prs = prs.filter(p => (p.status||'Pending') === prFilter);
   if (prSearch) prs = prs.filter(p => JSON.stringify(p).toLowerCase().includes(prSearch));
 
-  const isAdmin = currentUser && currentUser.role === 'A';
+  // const isApprover = currentUser && currentUser.role === 'A';
+  const isApprover = can('pr:approve');
 
   if (!prs.length) {
     tbody.innerHTML = `<tr><td colspan="9"><div class="empty"><div class="empty-icon">📋</div><div class="empty-text">No PRs match this filter</div></div></td></tr>`;
@@ -188,7 +189,7 @@ function renderPRs() {
   tbody.innerHTML = prs.map(p => {
     const status = p.status || 'Pending';
     let actions = '';
-    if (isAdmin && status === 'Pending') {
+    if (isApprover && status === 'Pending') {
       actions = `
         <button class="btn btn-success btn-sm" onclick="openApproveModal('${esc(p.pr_number)}')">✓ Approve</button>
         <button class="btn btn-warn btn-sm" style="margin-left:.3rem;" onclick="openRejectModal('${esc(p.pr_number)}')">✗ Reject</button>`;

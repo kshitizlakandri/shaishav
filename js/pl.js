@@ -66,8 +66,8 @@ async function submitPL() {
         p_purchase_received_from: v('pl-from'),
         p_quantity: v('pl-qty'),
         p_price: v('pl-price'),
-        p_billing_date: v('pl-billing-date'),
-        p_ref_number: v('pl-bill-no') ? v('pl-bill-no') : null,
+        p_billing_date: null, //v('pl-billing-date'),
+        p_ref_number: null, //v('pl-bill-no') ? v('pl-bill-no') : null,
         p_remarks: v('pl-remarks') ? v('pl-remarks') : null
       }
     );

@@ -54,12 +54,12 @@
 
         <nav id="main-nav">
           <button onclick="showPage('home')"      id="nav-home">🏠 <span>Home</span></button>
-          <button onclick="showPage('items')"     id="nav-items">📦 <span>Item Master</span></button>
-          <button onclick="showPage('pr')"        id="nav-pr">📋 <span>Purchase Requisition</span></button>
-          <button onclick="showPage('pl')"        id="nav-pl">🧾 <span>Purchase Order</span></button>
-          <button onclick="showPage('mr')"        id="nav-mr">📥 <span>Material Receipt</span></button>
-          <button onclick="showPage('indent')"    id="nav-indent">📤 <span>Indent</span></button>
-          <button onclick="goToReportsPage()"    id="nav-reports">📊 <span>Reports</span></button>
+          <button onclick="showPage('items')"     id="nav-items" data-perm="items:view">📦 <span>Item Master</span></button>
+          <button onclick="showPage('pr')"        id="nav-pr" data-perm="pr:view">📋 <span>Purchase Requisition</span></button>
+          <button onclick="showPage('pl')"        id="nav-pl" data-perm="pl:view">🧾 <span>Purchase Order</span></button>
+          <button onclick="showPage('mr')"        id="nav-mr" data-perm="mr:view">📥 <span>Material Receipt</span></button>
+          <button onclick="showPage('indent')"    id="nav-indent" data-perm="indent:view">📤 <span>Indent</span></button>
+          <button onclick="goToReportsPage()"    id="nav-reports" data-perm="reports:view">📊 <span>Reports</span></button>
         </nav>
 
         <div class="sidebar-ext-link" id="ext-link-wrap" style="display:none;">

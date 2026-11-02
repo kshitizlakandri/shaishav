@@ -748,3 +748,7 @@ tr:hover td { background: #f8f7f2; }
   .avail-stat { border-right: none; border-bottom: 1px solid var(--border); }
   .avail-stat:last-child { border-bottom: none; }
 }
+
+/* ─── ACCESS CONTROL ─── */
+[hidden] { display: none !important; }
+.split-2.single-col, .split-equal.single-col { grid-template-columns: 1fr; }

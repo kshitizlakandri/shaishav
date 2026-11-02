@@ -2,6 +2,10 @@
 // NAVIGATION, DROPDOWNS, GLOBAL REFRESH / RENDER
 // ─────────────────────────────────────────────────────────
 function showPage(name) {
+  if (!document.getElementById('page-' + name)) {
+    showToast("You don't have access to that page", 'error');
+    return;
+  }
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + name).classList.add('active');
@@ -10,6 +14,7 @@ function showPage(name) {
 function goHome() { showPage('home'); }
 
 function goToReportsPage() {
+  if (!can('reports:view')) { showToast("You don't have access to that page", 'error'); return; }
   window.location.href = "reports.html";
 }
 
@@ -29,6 +34,7 @@ function setDefaultDates() {
 async function populateDropdowns() {
   ['pr-location','pl-location','indent-location'].forEach(id => {
     const sel = document.getElementById(id);
+    if (!sel) return;
     sel.innerHTML = '<option value="" disabled selected hidden>Select…</option>';
     STATE.locations.forEach(l => sel.innerHTML += `<option value="${l.location_id}">${l.location_name}</option>`);
   });
@@ -38,8 +44,8 @@ async function populateDropdowns() {
 
   const approvedPRs = STATE.prs.filter(p => p.status === 'Approved');
   const plPRSel = document.getElementById('pl-linked-pr');
-  plPRSel.innerHTML = '<option value="">— None —</option>';
-  approvedPRs.forEach(p => plPRSel.innerHTML += `<option value="${p.pr_number}">${p.pr_number} — ${p.item_name} @ ${p.location_name}</option>`);
+  if (plPRSel) plPRSel.innerHTML = '<option value="">— None —</option>';
+  if (plPRSel) approvedPRs.forEach(p => plPRSel.innerHTML += `<option value="${p.pr_number}">${p.pr_number} — ${p.item_name} @ ${p.location_name}</option>`);
 
   // MR references a recorded Purchase Order / ledger entry
   const mrPLSel = document.getElementById('mr-linked-pl');
@@ -68,7 +74,13 @@ async function refreshData() {
 }
 
 function renderAll() {
-  renderHome(); renderCatalogue(); renderItems(); renderPRs(); renderPLs(); renderMRs(); renderIndents();
+  const has = n => !!document.getElementById('page-' + n);
+  renderHome();
+  if (has('items'))  { renderCatalogue(); renderItems(); }
+  if (has('pr'))     renderPRs();
+  if (has('pl'))     renderPLs();
+  if (has('mr'))     renderMRs();
+  if (has('indent')) renderIndents();
 }
 
 function renderHome() {

@@ -1,13 +1,14 @@
 // ─────────────────────────────────────────────────────────
 // APP BOOTSTRAP
-// Loads each page partial from /pages into #page-container,
-// then wires up keyboard handlers and starts the auth check.
+// Page partials in /pages are fetched only for pages the user may view
+// (home is always loaded). Called from checkUser() once permissions are known.
 // ─────────────────────────────────────────────────────────
 const PAGES = ['home', 'items', 'pr', 'pl', 'mr', 'indent'];
 
 async function loadPages() {
   const container = document.getElementById('page-container');
-  const htmls = await Promise.all(PAGES.map(async name => {
+  const allowed = PAGES.filter(name => name === 'home' || can(name + ':view'));
+  const htmls = await Promise.all(allowed.map(async name => {
     const res = await fetch(`pages/${name}.html`);
     if (!res.ok) throw new Error(`Could not load pages/${name}.html (${res.status})`);
     return res.text();
@@ -15,17 +16,16 @@ async function loadPages() {
   container.innerHTML = htmls.join('\n');
 }
 
-async function boot() {
+async function loadPagesAndInit() {
   try {
     await loadPages();
+    initComboboxKeyboard();
+    return true;
   } catch (err) {
     console.error(err);
-    document.querySelector('#loading-card-inner .loading-msg').textContent =
-      'Failed to load app pages. Serve the folder over http (e.g. Live Server), not file://';
-    return;
+    showDenied(null, 'Failed to load app pages. Serve the folder over http (e.g. Live Server), not file://');
+    return false;
   }
-  initComboboxKeyboard();
-  checkUser();
 }
 
-window.addEventListener('load', boot);
+window.addEventListener('load', checkUser);
