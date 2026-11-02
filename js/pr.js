@@ -178,7 +178,6 @@ function renderPRs() {
   if (prFilter !== 'All') prs = prs.filter(p => (p.status||'Pending') === prFilter);
   if (prSearch) prs = prs.filter(p => JSON.stringify(p).toLowerCase().includes(prSearch));
 
-  // const isApprover = currentUser && currentUser.role === 'A';
   const isApprover = can('pr:approve');
 
   if (!prs.length) {
