@@ -160,7 +160,7 @@ function statusBadge(s) {
 
 function setPRFilter(f, el) {
   prFilter = f;
-  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('#pr-filter-tabs .filter-tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
   renderPRs();
 }

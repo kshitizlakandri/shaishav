@@ -78,22 +78,60 @@
       </div>
     </div>
     <div class="card">
-      <div class="card-header">
-        <span class="card-title">All Ledger Entries</span>
-        <span id="pl-count" class="badge badge-green">0</span>
+    <div class="card-header">
+      <span class="card-title">All Ledger Entries</span>
+      <span id="pl-count" class="badge badge-green">0</span>
+    </div>
+
+    <div class="filter-tabs" id="pl-filter-tabs">
+      <button class="filter-tab active" onclick="setPLFilter('All', this)">All</button>
+      <button class="filter-tab" onclick="setPLFilter('Pending', this)">Pending</button>
+      <button class="filter-tab" onclick="setPLFilter('Approved', this)">Approved</button>
+      <button class="filter-tab" onclick="setPLFilter('Rejected', this)">Rejected</button>
+    </div>
+
+    <div class="search-wrap" style="padding-top:.35rem;">
+      <div class="search-inner">
+        <span class="search-icon-abs">🔍</span>
+        <input type="text" placeholder="Search…" oninput="filterPLTable(this.value)" />
       </div>
-      <div class="search-wrap">
-        <div class="search-inner">
-          <span class="search-icon-abs">🔍</span>
-          <input type="text" placeholder="Search…" oninput="filterTable('pl-table', this.value)" />
-        </div>
-      </div>
-      <div class="table-wrap" style="max-height:600px; overflow-y:auto;">
-        <table id="pl-table">
-          <thead><tr><th>PL No.</th><th>Date</th><th>Location</th><th>Item</th><th>Source</th><th>Qty</th><th>Total</th><th>Bill No.</th><th>Linked PR</th></tr></thead>
-          <tbody id="pl-tbody"><tr><td colspan="9"><div class="load-center"><div class="spinner"></div>Loading…</div></td></tr></tbody>
-        </table>
-      </div>
+    </div>
+
+    <div class="table-wrap" style="max-height:600px; overflow-y:auto;">
+      <table id="pl-table">
+        <thead>
+          <tr>
+            <th>PL No.</th><th>Date</th><th>Location</th><th>Item</th><th>Source</th>
+            <th>Qty</th><th>Total</th><th>Bill No.</th><th>Linked PR</th>
+            <th>Status</th><th>Approved By</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="pl-tbody"><tr><td colspan="12"><div class="load-center"><div class="spinner"></div>Loading…</div></td></tr></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="modal-overlay" id="pl-approve-modal">
+  <div class="modal">
+    <div class="modal-title">✅ Approve Purchase Order</div>
+    <div class="modal-desc" id="pl-approve-modal-desc">Approve this purchase order?</div>
+    <div class="modal-actions">
+      <button class="btn" style="background:var(--bg); color:var(--ink2);" onclick="closeModal('pl-approve-modal')">Cancel</button>
+      <button class="btn btn-success" onclick="doApprovePL()">Approve</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="pl-reject-modal">
+  <div class="modal">
+    <div class="modal-title">❌ Reject Purchase Order</div>
+    <div class="modal-desc" id="pl-reject-modal-desc">Provide a reason for rejection.</div>
+    <div class="modal-field">
+      <label style="font-size:.7rem; text-transform:uppercase; letter-spacing:.05em; color:var(--ink3);">Reason *</label>
+      <input type="text" id="pl-reject-reason" placeholder="e.g. Wrong vendor" />
+    </div>
+    <div class="modal-actions">
+      <button class="btn" style="background:var(--bg); color:var(--ink2);" onclick="closeModal('pl-reject-modal')">Cancel</button>
+      <button class="btn btn-danger" onclick="doRejectPL()">Reject</button>
     </div>
   </div>
 </div>

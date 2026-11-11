@@ -1,6 +1,12 @@
 // ─────────────────────────────────────────────────────────
 // PURCHASE ORDER / LEDGER (PL)
 // ─────────────────────────────────────────────────────────
+
+let plFilter = 'All';
+let plSearch = '';
+let pendingApprovalPL = null;
+let pendingRejectPL = null;
+
 function onPLPRReferenceChange() {
   const linkedPrNumber = v('pl-linked-pr');
   if (linkedPrNumber.trim() === '') {
@@ -90,25 +96,116 @@ async function submitPL() {
 
 function renderPLs() {
   const tbody = document.getElementById('pl-tbody');
-  const pls = STATE.pls;
-  document.getElementById('pl-count').textContent = pls.length;
-  const nums = pls.map(p=>parseInt(p.pl_number.split('_').pop())||0);
-  document.getElementById('pl-number-preview').textContent = 'PO_'+String((nums.length?Math.max(...nums)+1:1)).padStart(5,'0');
-  if (!pls.length) {
-    tbody.innerHTML = `<tr><td colspan="9"><div class="empty"><div class="empty-icon">🧾</div><div class="empty-text">No ledger entries yet</div></div></td></tr>`;
-    document.getElementById('pl-stats').innerHTML = ''; return;
-  }
-  tbody.innerHTML = pls.map(p=>`<tr>
-    <td><span class="badge badge-green">${p.pl_number}</span></td>
-    <td>${p.date_of_material_received||'—'}</td><td>${p.location_name}</td>
-    <td style="max-width:130px; overflow:hidden; text-overflow:ellipsis;">${p.item}</td>
-    <td>${p.source||'—'}</td><td>${p.quantity||'—'}</td>
-    <td>₹${Number(p.total||0).toLocaleString('en-IN')}</td>
-    <td>${p.reference_number||'—'}</td>
-    <td>${p.pr_number ? `<span class="badge badge-amber">${p.pr_number}</span>` : '—'}</td>
-  </tr>`).join('');
-  const total = pls.reduce((s,p)=>s+(Number(p.total)||0),0);
+  const all = STATE.pls;
+  document.getElementById('pl-count').textContent = all.length;
+
+  const nums = all.map(p => parseInt(p.pl_number.split('_').pop()) || 0);
+  document.getElementById('pl-number-preview').textContent =
+    'PL_' + String(nums.length ? Math.max(...nums) + 1 : 1).padStart(5, '0');
+
+  // Stats are built from ALL rows, before filtering, so they don't vanish on an empty filter
+  const total = all.reduce((s, p) => s + (Number(p.total) || 0), 0);
+  const byStatus = {};
+  all.forEach(p => { const s = p.status || 'Pending'; byStatus[s] = (byStatus[s] || 0) + 1; });
   document.getElementById('pl-stats').innerHTML = `
-    <div class="stat-card"><div class="stat-label">Total Entries</div><div class="stat-value">${pls.length}</div></div>
-    <div class="stat-card"><div class="stat-label">Total Value</div><div class="stat-value">₹${total.toLocaleString('en-IN')}</div><div class="stat-sub">received</div></div>`;
+    <div class="stat-card"><div class="stat-label">Total Entries</div><div class="stat-value">${all.length}</div></div>
+    <div class="stat-card"><div class="stat-label">Total Value</div><div class="stat-value">₹${total.toLocaleString('en-IN')}</div><div class="stat-sub">all entries</div></div>
+    ${Object.entries(byStatus).map(([s, c]) => `<div class="stat-card"><div class="stat-label">${s}</div><div class="stat-value">${c}</div></div>`).join('')}`;
+
+  // Filter, then search
+  let pls = all;
+  if (plFilter !== 'All') pls = pls.filter(p => (p.status || 'Pending') === plFilter);
+  if (plSearch) pls = pls.filter(p => JSON.stringify(p).toLowerCase().includes(plSearch));
+
+  if (!pls.length) {
+    tbody.innerHTML = `<tr><td colspan="12"><div class="empty"><div class="empty-icon">🧾</div><div class="empty-text">No purchase orders match this filter</div></div></td></tr>`;
+    return;
+  }
+
+  // Swap for can('pl:approve') once your permissions are in
+  const canApprove = currentUser && currentUser.role === 'A';
+
+  tbody.innerHTML = pls.map(p => {
+    const status = p.status || 'Pending';
+    let actions = '';
+    if (canApprove && status === 'Pending') {
+      actions = `
+        <button class="btn btn-success btn-sm" onclick="openApprovePLModal('${esc(p.pl_number)}')">✓ Approve</button>
+        <button class="btn btn-warn btn-sm" style="margin-left:.3rem;" onclick="openRejectPLModal('${esc(p.pl_number)}')">✗ Reject</button>`;
+    }
+    return `<tr>
+      <td><span class="badge badge-green">${p.pl_number}</span></td>
+      <td>${p.date_of_material_received || '—'}</td><td>${p.location_name}</td>
+      <td style="max-width:130px; overflow:hidden; text-overflow:ellipsis;">${p.item}</td>
+      <td>${p.source || '—'}</td><td>${p.quantity || '—'}</td>
+      <td>₹${Number(p.total || 0).toLocaleString('en-IN')}</td>
+      <td>${p.reference_number || '—'}</td>
+      <td>${p.pr_number ? `<span class="badge badge-amber">${p.pr_number}</span>` : '—'}</td>
+      <td>${statusBadge(status)}</td>
+      <td>${p.evaluated_by ? `<span class="badge badge-blue">${p.evaluated_by}</span>` : '—'}</td>
+      <td style="white-space:nowrap;">${actions}</td>
+    </tr>`;
+  }).join('');
+}
+
+function setPLFilter(f, el) {
+  plFilter = f;
+  // scoped to PL's tabs so it doesn't clear the PR page's active tab
+  document.querySelectorAll('#pl-filter-tabs .filter-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderPLs();
+}
+
+function filterPLTable(q) { plSearch = q.toLowerCase(); renderPLs(); }
+
+function openApprovePLModal(plNumber) {
+  pendingApprovalPL = plNumber;
+  document.getElementById('pl-approve-modal-desc').textContent = `Approve ${plNumber}?`;
+  document.getElementById('pl-approve-modal').classList.add('show');
+}
+
+async function doApprovePL() {
+  closeModal('pl-approve-modal');
+  if (!pendingApprovalPL) return;
+  try {
+    const result = await callRpc('approve_purchase_order', { p_pl_number: pendingApprovalPL });
+    if (!result.responseData && !result.error) {
+      showToast('Purchase Order approved ✓', 'success');
+      refreshData();
+    } else if (result.error) {
+      showToast('Error: ' + result.error.message, 'error');
+    }
+  } catch (err) {
+    showToast('Error: ' + err.message, 'error');
+  }
+  pendingApprovalPL = null;
+}
+
+function openRejectPLModal(plNumber) {
+  pendingRejectPL = plNumber;
+  document.getElementById('pl-reject-modal-desc').textContent = `Reject ${plNumber}?`;
+  document.getElementById('pl-reject-reason').value = '';
+  document.getElementById('pl-reject-modal').classList.add('show');
+}
+
+async function doRejectPL() {
+  const reason = document.getElementById('pl-reject-reason').value.trim();
+  if (!reason) { showToast('Please enter a reason', 'error'); return; }
+  closeModal('pl-reject-modal');
+  if (!pendingRejectPL) return;
+  try {
+    const result = await callRpc('reject_purchase_order', {
+      p_pl_number: pendingRejectPL,
+      p_rejection_reason: reason
+    });
+    if (!result.responseData && !result.error) {
+      showToast('Purchase Order rejected', 'success');
+      refreshData();
+    } else if (result.error) {
+      showToast('Error: ' + result.error.message, 'error');
+    }
+  } catch (err) {
+    showToast('Error: ' + err.message, 'error');
+  }
+  pendingRejectPL = null;
 }
