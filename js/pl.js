@@ -92,6 +92,7 @@ async function submitPL() {
     setLoading(btn, false);
     showToast('Error: ' + err.message, 'error');
   }
+  renderPLs();
 }
 
 function renderPLs() {
@@ -122,8 +123,7 @@ function renderPLs() {
     return;
   }
 
-  // Swap for can('pl:approve') once your permissions are in
-  const canApprove = currentUser && currentUser.role === 'A';
+  const canApprove = currentUser && can('pl:approve');
 
   tbody.innerHTML = pls.map(p => {
     const status = p.status || 'Pending';
@@ -179,9 +179,11 @@ async function doApprovePL() {
     showToast('Error: ' + err.message, 'error');
   }
   pendingApprovalPL = null;
+  renderPLs();
 }
 
 function openRejectPLModal(plNumber) {
+  console.log('in openRejectPLModal');
   pendingRejectPL = plNumber;
   document.getElementById('pl-reject-modal-desc').textContent = `Reject ${plNumber}?`;
   document.getElementById('pl-reject-reason').value = '';
@@ -195,8 +197,8 @@ async function doRejectPL() {
   if (!pendingRejectPL) return;
   try {
     const result = await callRpc('reject_purchase_order', {
-      p_pl_number: pendingRejectPL,
-      p_rejection_reason: reason
+      p_pl_number: pendingRejectPL
+    , p_rejection_reason: reason
     });
     if (!result.responseData && !result.error) {
       showToast('Purchase Order rejected', 'success');
@@ -208,4 +210,5 @@ async function doRejectPL() {
     showToast('Error: ' + err.message, 'error');
   }
   pendingRejectPL = null;
+  renderPLs();
 }

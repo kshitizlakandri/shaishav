@@ -51,7 +51,7 @@ async function populateDropdowns() {
   const mrPLSel = document.getElementById('mr-linked-pl');
   if (mrPLSel) {
     mrPLSel.innerHTML = '<option value="">— None —</option>';
-    (STATE.pls || []).filter(p => p.mr_status != 'C').forEach(p => mrPLSel.innerHTML += `<option value="${p.pl_number}">${p.pl_number} — ${p.item} @ ${p.location_name}</option>`);
+    (STATE.pls || []).filter(p => p.status == 'Approved').forEach(p => mrPLSel.innerHTML += `<option value="${p.pl_number}">${p.pl_number} — ${p.item} @ ${p.location_name}</option>`);
   }
 
   // Populate "original indent" reference dropdown for Indent → Received flow
