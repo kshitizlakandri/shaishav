@@ -119,19 +119,21 @@
       <button class="btn btn-success" onclick="doApprovePL()">Approve</button>
     </div>
   </div>
-</div>
 
-<div class="modal-overlay" id="pl-reject-modal">
-  <div class="modal">
-    <div class="modal-title">❌ Reject Purchase Order</div>
-    <div class="modal-desc" id="pl-reject-modal-desc">Provide a reason for rejection.</div>
-    <div class="modal-field">
-      <label style="font-size:.7rem; text-transform:uppercase; letter-spacing:.05em; color:var(--ink3);">Reason *</label>
-      <input type="text" id="pl-reject-reason" placeholder="e.g. Wrong vendor" />
-    </div>
-    <div class="modal-actions">
-      <button class="btn" style="background:var(--bg); color:var(--ink2);" onclick="closeModal('pl-reject-modal')">Cancel</button>
-      <button class="btn btn-danger" onclick="doRejectPL()">Reject</button>
+  <div class="modal-overlay" id="pl-reject-modal">
+    <div class="modal">
+      <div class="modal-title">❌ Reject Purchase Order</div>
+      <div class="modal-desc" id="pl-reject-modal-desc">Provide a reason for rejection.</div>
+      <div class="modal-field">
+        <label style="font-size:.7rem; text-transform:uppercase; letter-spacing:.05em; color:var(--ink3);">Reason *</label>
+        <input type="text" id="pl-reject-reason" placeholder="e.g. Wrong vendor" />
+      </div>
+      <div class="modal-actions">
+        <button class="btn" style="background:var(--bg); color:var(--ink2);" onclick="closeModal('pl-reject-modal')">Cancel</button>
+        <button class="btn btn-danger" onclick="doRejectPL()">Reject</button>
+      </div>
     </div>
   </div>
+</div>
+</div>
 </div>
